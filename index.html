@@ -1,0 +1,3733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小林无忧生图</title>
+  <meta name="theme-color" content="#0f766e" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      color-scheme: light;
+      --bg: #eef3f6;
+      --panel: #ffffff;
+      --panel-soft: #f6fafb;
+      --text: #132033;
+      --muted: #637083;
+      --line: #d8e2e8;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --accent: #b45309;
+      --danger: #b42318;
+      --success: #087443;
+      --warning: #a15c07;
+      --radius: 8px;
+      --shadow: 0 20px 50px rgba(19, 32, 51, 0.1);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(15, 118, 110, 0.08), transparent 340px),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    button {
+      border: 0;
+    }
+
+    .app {
+      width: min(1540px, 100%);
+      margin: 0 auto;
+      padding: 26px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.08;
+      font-weight: 820;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 820px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--muted);
+      white-space: nowrap;
+      font-size: 13px;
+      box-shadow: 0 8px 22px rgba(19, 32, 51, 0.06);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+    }
+
+    .dot.ready {
+      background: var(--success);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(340px, 450px) minmax(460px, 1fr) minmax(320px, 420px);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-pad {
+      padding: 20px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 14px;
+      font-size: 16px;
+      font-weight: 780;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 520;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: #26364c;
+      font-size: 14px;
+      font-weight: 680;
+    }
+
+    label span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 480;
+    }
+
+    textarea,
+    select,
+    input[type="number"],
+    input[type="url"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdfe;
+      color: var(--text);
+      padding: 11px 12px;
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    textarea:focus,
+    select:focus,
+    input:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    }
+
+    textarea {
+      min-height: 146px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .api-row,
+    .reference-tools,
+    .compact-row,
+    .filter-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .upload-zone {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 160px;
+      padding: 18px;
+      border: 1.5px dashed #aebdcc;
+      border-radius: var(--radius);
+      background: var(--panel-soft);
+      cursor: pointer;
+      transition: border-color 0.16s ease, background 0.16s ease;
+      overflow: hidden;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragging {
+      border-color: var(--primary);
+      background: #eaf7f5;
+    }
+
+    .upload-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-empty {
+      display: grid;
+      gap: 8px;
+      place-items: center;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .upload-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #dff4f1;
+      color: var(--primary-dark);
+      font-size: 22px;
+      font-weight: 860;
+    }
+
+    .upload-title {
+      font-weight: 740;
+      color: #27364f;
+    }
+
+    .upload-hint,
+    .mode-note,
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .mode-note {
+      margin-top: 8px;
+      color: var(--primary-dark);
+    }
+
+    .reference-list,
+    .queue-list,
+    .history-list,
+    .library-list,
+    .debug-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .reference-list {
+      margin-top: 12px;
+    }
+
+    .reference-item,
+    .queue-item,
+    .history-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .reference-item {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 9px;
+    }
+
+    .reference-thumb,
+    .history-thumb,
+    .queue-thumb {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #101828;
+      object-fit: cover;
+    }
+
+    .reference-thumb {
+      width: 64px;
+      height: 64px;
+    }
+
+    .reference-meta,
+    .queue-meta,
+    .history-meta {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .reference-name,
+    .queue-title,
+    .history-title {
+      overflow: hidden;
+      color: #243047;
+      font-size: 13px;
+      font-weight: 730;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .reference-url,
+    .queue-subtitle,
+    .history-subtitle {
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .reference-note {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .reference-note input {
+      min-height: 32px;
+      padding: 7px 9px;
+      font-size: 12px;
+    }
+
+    .status-text {
+      color: var(--primary-dark);
+      font-size: 12px;
+    }
+
+    .status-text.error {
+      color: var(--danger);
+    }
+
+    .status-text.success {
+      color: var(--success);
+    }
+
+    .icon-btn,
+    .remove-reference {
+      width: 32px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #eef2f7;
+      color: #243047;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .icon-btn:hover,
+    .remove-reference:hover {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f7fafc;
+      color: #344054;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .debug-box,
+    .canvas-editor {
+      min-height: 120px;
+      max-height: 260px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #0f172a;
+      color: #d9e2ec;
+      padding: 12px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .canvas-editor {
+      display: none;
+      place-items: center;
+      background: #f8fafc;
+      padding: 10px;
+    }
+
+    .canvas-editor canvas {
+      max-width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 740;
+      text-decoration: none;
+      transition: transform 0.12s ease, background 0.16s ease, opacity 0.16s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      flex: 1 1 180px;
+      color: #fff;
+      background: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      color: #243047;
+      background: #eef2f7;
+    }
+
+    .btn-secondary:hover {
+      background: #e3e9f2;
+    }
+
+    .btn-danger {
+      color: #fff;
+      background: var(--danger);
+    }
+
+    .output {
+      min-height: 680px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .output-header h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .task-id {
+      color: var(--muted);
+      font-size: 12px;
+      word-break: break-all;
+      text-align: right;
+    }
+
+    .stage {
+      flex: 1;
+      min-height: 420px;
+      padding: 18px;
+      background:
+        linear-gradient(90deg, rgba(216, 226, 232, 0.62) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(216, 226, 232, 0.62) 1px, transparent 1px);
+      background-size: 28px 28px;
+      background-color: #fbfcfe;
+    }
+
+    .placeholder {
+      display: grid;
+      place-items: center;
+      min-height: 360px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .placeholder strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #27364f;
+      font-size: 18px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    .result-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 12px 26px rgba(19, 32, 51, 0.08);
+    }
+
+    .result-card img {
+      width: 100%;
+      display: block;
+      aspect-ratio: 1 / 1;
+      background: #101828;
+      object-fit: contain;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .small-btn {
+      min-height: 34px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      background: #eef2f7;
+      color: #243047;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 680;
+    }
+
+    .small-btn:hover {
+      background: #e3e9f2;
+    }
+
+    .message {
+      margin: 0;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: #fff;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .message.loading {
+      color: var(--primary-dark);
+    }
+
+    .message.error {
+      color: var(--danger);
+    }
+
+    .message.success {
+      color: var(--success);
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .queue-item,
+    .history-item {
+      padding: 12px;
+    }
+
+    .queue-head,
+    .history-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .queue-status {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #243047;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .queue-status.running {
+      background: #dff4f1;
+      color: var(--primary-dark);
+    }
+
+    .queue-status.done {
+      background: #dcfce7;
+      color: var(--success);
+    }
+
+    .queue-status.failed {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .queue-images,
+    .history-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .queue-thumb,
+    .history-thumb {
+      width: 58px;
+      height: 58px;
+    }
+
+    .history-actions,
+    .queue-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .saved-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .inline-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .library-list,
+    .admin-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .library-item,
+    .admin-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 10px;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .compare-grid img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      background: #101828;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+    }
+
+    .saved-prompt {
+      max-width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: #243047;
+      cursor: pointer;
+      padding: 7px 10px;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .saved-prompt:hover {
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    .confirm-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(19, 32, 51, 0.46);
+    }
+
+    .confirm-modal.open {
+      display: grid;
+    }
+
+    .confirm-dialog {
+      width: min(720px, 100%);
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 28px 80px rgba(19, 32, 51, 0.28);
+      border: 1px solid var(--line);
+    }
+
+    .confirm-dialog header,
+    .confirm-dialog footer {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .confirm-dialog footer {
+      border-top: 1px solid var(--line);
+      border-bottom: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .confirm-body {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .confirm-row {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .confirm-row strong {
+      color: #243047;
+    }
+
+    .empty-list {
+      padding: 16px;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      color: var(--muted);
+      background: #fbfdfe;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      margin-right: 8px;
+      border-radius: 50%;
+      border: 2px solid rgba(15, 118, 110, 0.24);
+      border-top-color: var(--primary);
+      vertical-align: -3px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .contact-card {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      width: min(310px, calc(100vw - 36px));
+      padding: 14px;
+      border: 1px solid #f0d9a8;
+      border-radius: var(--radius);
+      background: #fff8e7;
+      color: #5f3b05;
+      box-shadow: 0 16px 38px rgba(19, 32, 51, 0.18);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .contact-card strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #7c2d12;
+      font-size: 14px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 1220px) {
+      .workspace {
+        grid-template-columns: minmax(340px, 460px) minmax(0, 1fr);
+      }
+
+      .side-stack {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 860px) {
+      .app {
+        padding: 16px;
+      }
+
+      .topbar,
+      .workspace,
+      .side-stack {
+        display: block;
+      }
+
+      .panel {
+        margin-bottom: 16px;
+      }
+
+      .status-pill {
+        margin-top: 14px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app {
+        padding: 12px;
+      }
+
+      .panel-pad {
+        padding: 16px;
+      }
+
+      .grid-2,
+      .api-row,
+      .reference-tools,
+      .compact-row,
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+
+      .output-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .task-id {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>小林无忧生图</h1>
+        <p class="subtitle">
+          支持本地多参考图、任务队列、失败自动重试、历史记录和一键重新生图。API Key 会保存在当前浏览器，不刷新丢失。
+        </p>
+      </div>
+      <div class="status-pill" id="configStatus">
+        <span class="dot" id="configDot"></span>
+        <span id="configText">检查 API 配置中</span>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <section class="panel panel-pad">
+        <h2 class="section-title">生成设置 <span>Seedream 4.5</span></h2>
+        <form id="generateForm">
+          <div class="field">
+            <label for="apiKeyInput">API Key <span>保存在浏览器</span></label>
+            <div class="api-row">
+              <input type="password" id="apiKeyInput" autocomplete="off" placeholder="填写 VModel API Key" />
+              <button class="btn btn-secondary" id="saveApiKeyBtn" type="button">保存</button>
+            </div>
+            <div class="hint" id="apiKeyHint">也可以继续使用 .env 里的 API Key。</div>
+          </div>
+
+          <div class="field" id="loginField" style="display:none;">
+            <label for="appPasswordInput">访问密码 <span>局域网共享保护</span></label>
+            <div class="api-row">
+              <input type="password" id="appPasswordInput" autocomplete="current-password" placeholder="输入访问密码" />
+              <button class="btn btn-secondary" id="loginBtn" type="button">登录</button>
+            </div>
+            <div class="hint" id="loginHint">后端设置 APP_PASSWORD 时需要登录。</div>
+          </div>
+
+          <div class="field">
+            <label for="userProfile">用户/账号 <span>隔离历史、队列、收藏</span></label>
+            <div class="api-row">
+              <input type="text" id="userProfile" placeholder="default" />
+              <button class="btn btn-secondary" id="switchUserBtn" type="button">切换</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="projectName">项目/文件夹 <span>用于分组管理</span></label>
+              <input type="text" id="projectName" placeholder="默认项目" />
+            </div>
+            <div class="field">
+              <label for="tagInput">标签 <span>逗号分隔</span></label>
+              <input type="text" id="tagInput" placeholder="头像, 产品图, 写实" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="referenceUrl">参考图片 URL <span>可手动添加，最多 5 张</span></label>
+            <div class="reference-tools">
+              <input type="url" id="referenceUrl" placeholder="https://example.com/image.png" />
+              <button class="btn btn-secondary" id="addReferenceUrlBtn" type="button">添加</button>
+            </div>
+            <div class="mode-note" id="modeNote">当前为文生图模式。上传或添加参考图后自动进入图生图模式。</div>
+          </div>
+
+          <div class="field">
+            <label>本地图片上传 <span>JPG / PNG / WEBP，最多 5 张，每张最大 8MB</span></label>
+            <div class="upload-zone" id="uploadZone">
+              <div class="upload-empty">
+                <div class="upload-icon">+</div>
+                <div class="upload-title">选择或拖入参考图</div>
+                <div class="upload-hint">上传后转换成 VModel 可用图片 URL</div>
+              </div>
+              <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp" multiple />
+            </div>
+            <div class="reference-list" id="referenceList"></div>
+          </div>
+
+          <div class="field">
+            <label for="prompt">提示词 <span>必填，会自动记忆</span></label>
+            <textarea id="prompt" required placeholder="输入你的生图提示词"></textarea>
+            <div class="actions">
+              <button class="btn btn-secondary" id="savePromptBtn" type="button">收藏提示词</button>
+              <button class="btn btn-secondary" id="enhancePromptBtn" type="button">增强提示词</button>
+              <button class="btn btn-secondary" id="expandPromptBtn" type="button">展开变量</button>
+              <button class="btn btn-secondary" id="clearSavedPromptsBtn" type="button">清空收藏</button>
+            </div>
+            <div class="saved-prompts" id="savedPrompts"></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="presetSelect">参数预设 <span>常用场景</span></label>
+              <select id="presetSelect">
+                <option value="">选择预设</option>
+                <option value="portrait">人像写真</option>
+                <option value="product">电商产品图</option>
+                <option value="avatar">头像</option>
+                <option value="realphoto">写实摄影</option>
+                <option value="poster">海报主图</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cleanupHours">上传保留 <span>清理策略</span></label>
+              <select id="cleanupHours">
+                <option value="1">1 小时</option>
+                <option value="24" selected>1 天</option>
+                <option value="168">7 天</option>
+                <option value="720">30 天</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="negativePrompt">负面提示词 <span>会附加到提示词中</span></label>
+            <textarea id="negativePrompt" placeholder="例如：不要文字、不要水印、不要多手、不要变脸"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="batchPrompts">批量提示词 <span>每行一个任务，可选</span></label>
+            <textarea id="batchPrompts" placeholder="每行一个提示词。填写后会按行加入队列。"></textarea>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="size">分辨率 <span>图生图/文生图均可用</span></label>
+              <select id="size">
+                <option value="1K">1K</option>
+                <option value="2K" selected>2K</option>
+                <option value="4K">4K</option>
+                <option value="custom">自定义</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="aspectRatio">宽高比 <span>图生图可调整</span></label>
+              <select id="aspectRatio">
+                <option value="match_input_image" selected>跟随参考图</option>
+                <option value="1:1">1:1 方图</option>
+                <option value="16:9">16:9 横图</option>
+                <option value="9:16">9:16 竖图</option>
+                <option value="4:3">4:3 横图</option>
+                <option value="3:4">3:4 竖图</option>
+                <option value="3:2">3:2 横图</option>
+                <option value="2:3">2:3 竖图</option>
+                <option value="21:9">21:9 宽银幕</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2" id="customSizeGroup" style="display: none;">
+            <div class="field">
+              <label for="customWidth">宽度 <span>1024-4096</span></label>
+              <input type="number" id="customWidth" value="2048" min="1024" max="4096" step="1" />
+            </div>
+            <div class="field">
+              <label for="customHeight">高度 <span>1024-4096</span></label>
+              <input type="number" id="customHeight" value="2048" min="1024" max="4096" step="1" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="taskCount">加入任务数 <span>批量排队</span></label>
+              <input type="number" id="taskCount" value="1" min="1" max="20" step="1" />
+            </div>
+            <div class="field">
+              <label for="concurrency">同时生成 <span>最多 5 个</span></label>
+              <input type="number" id="concurrency" value="2" min="1" max="5" step="1" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="compressQuality">上传压缩质量 <span>自动压缩</span></label>
+              <select id="compressQuality">
+                <option value="0.72" selected>标准压缩</option>
+                <option value="0.86">高质量</option>
+                <option value="0.58">强压缩</option>
+                <option value="1">不压缩</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="maxImageSide">最长边 <span>上传前缩放</span></label>
+              <select id="maxImageSide">
+                <option value="1536">1536px</option>
+                <option value="2048" selected>2048px</option>
+                <option value="2560">2560px</option>
+                <option value="4096">4096px</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="inline-check">
+              <input type="checkbox" id="cropBeforeUpload" />
+              上传前打开裁剪/旋转编辑
+            </label>
+            <div class="canvas-editor" id="canvasEditor">
+              <canvas id="editCanvas"></canvas>
+            </div>
+            <div class="actions">
+              <button class="btn btn-secondary" id="rotateImageBtn" type="button">旋转</button>
+              <button class="btn btn-secondary" id="cropSquareBtn" type="button">方形裁剪</button>
+              <button class="btn btn-secondary" id="applyEditBtn" type="button">应用编辑</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="watermarkText">下载水印 <span>可选</span></label>
+              <input type="text" id="watermarkText" placeholder="留空不加水印" />
+            </div>
+            <div class="field">
+              <label for="fileNamePattern">命名规则 <span>下载文件名</span></label>
+              <select id="fileNamePattern">
+                <option value="date-prompt">日期-提示词</option>
+                <option value="prompt-date">提示词-日期</option>
+                <option value="task-index">任务-序号</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="dailyQuota">每日配额 <span>0 表示不限</span></label>
+              <input type="number" id="dailyQuota" value="0" min="0" max="99999" step="1" />
+            </div>
+            <div class="field">
+              <label for="unitCost">单图成本 <span>用于估算</span></label>
+              <input type="number" id="unitCost" value="0" min="0" max="99999" step="0.01" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="inline-check">
+              <input type="checkbox" id="notifyDone" />
+              任务完成后浏览器通知和声音提醒
+            </label>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="submitBtn" type="submit">加入队列并生成</button>
+            <button class="btn btn-secondary" id="resetBtn" type="button">清空当前</button>
+            <button class="btn btn-secondary" id="debugPayloadBtn" type="button">查看提交参数</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel output">
+        <div class="output-header">
+          <h2>生成结果</h2>
+          <div class="task-id" id="taskIdText">尚未提交任务</div>
+        </div>
+        <div class="stage" id="stage">
+          <div class="placeholder" id="placeholder">
+            <div>
+              <strong>等待生成</strong>
+              任务完成后图片会显示在这里，并可直接下载到本地。
+            </div>
+          </div>
+          <div class="result-grid" id="resultGrid" style="display: none;"></div>
+        </div>
+        <p class="message" id="message">请填写或保存 API Key，然后提交任务。</p>
+      </section>
+
+      <aside class="side-stack">
+        <section class="panel panel-pad">
+          <h2 class="section-title">任务队列 <span id="queueStats">0 个任务</span></h2>
+          <div class="actions">
+            <button class="btn btn-secondary" id="pauseQueueBtn" type="button">暂停队列</button>
+            <button class="btn btn-secondary" id="resumeQueueBtn" type="button">继续队列</button>
+            <button class="btn btn-secondary" id="retryFailedBtn" type="button">重试失败</button>
+            <button class="btn btn-secondary" id="clearQueueBtn" type="button">清空已完成</button>
+            <button class="btn btn-secondary" id="downloadAllBtn" type="button">批量下载结果</button>
+            <button class="btn btn-secondary" id="zipQueueBtn" type="button">ZIP下载</button>
+          </div>
+          <div class="queue-list" id="queueList"></div>
+        </section>
+
+        <section class="panel panel-pad">
+          <h2 class="section-title">历史记录 <span id="historyStats">0 条</span></h2>
+          <div class="field">
+            <label for="historySearch">搜索历史 <span>提示词/备注</span></label>
+            <div class="filter-row">
+              <input type="text" id="historySearch" placeholder="输入关键词" />
+              <select id="historyFilter">
+                <option value="all">全部</option>
+                <option value="i2i">图生图</option>
+                <option value="t2i">文生图</option>
+                <option value="today">今天</option>
+                <option value="week">7天内</option>
+              </select>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-secondary" id="clearHistoryBtn" type="button">清空历史</button>
+            <button class="btn btn-secondary" id="downloadHistoryBtn" type="button">下载历史结果</button>
+            <button class="btn btn-secondary" id="zipHistoryBtn" type="button">ZIP历史</button>
+            <button class="btn btn-secondary" id="exportDataBtn" type="button">导出数据</button>
+            <button class="btn btn-secondary" id="importDataBtn" type="button">导入数据</button>
+            <input type="file" id="importDataInput" accept="application/json" style="display:none" />
+          </div>
+          <div class="history-list" id="historyList"></div>
+        </section>
+
+        <section class="panel panel-pad">
+          <h2 class="section-title">素材库 <span id="libraryStats">0 张</span></h2>
+          <div class="field">
+            <label for="libraryFilter">筛选素材 <span>项目/标签/备注</span></label>
+            <input type="text" id="libraryFilter" placeholder="输入关键词" />
+          </div>
+          <div class="actions">
+            <button class="btn btn-secondary" id="clearLibraryBtn" type="button">清空素材库</button>
+            <button class="btn btn-secondary" id="dedupeLibraryBtn" type="button">素材去重</button>
+          </div>
+          <div class="library-list" id="libraryList"></div>
+        </section>
+
+        <section class="panel panel-pad">
+          <h2 class="section-title">统计/管理员 <span id="statsText">待加载</span></h2>
+          <div class="actions">
+            <button class="btn btn-secondary" id="refreshAdminBtn" type="button">刷新状态</button>
+            <button class="btn btn-secondary" id="cleanupUploadsBtn" type="button">清理上传文件</button>
+            <button class="btn btn-secondary" id="rerunFilteredBtn" type="button">筛选历史重跑</button>
+            <button class="btn btn-secondary" id="syncStateBtn" type="button">同步数据库</button>
+          </div>
+          <div class="admin-list" id="adminList"></div>
+        </section>
+
+        <section class="panel panel-pad">
+          <h2 class="section-title">调试面板 <span id="debugStats">最近请求</span></h2>
+          <div class="actions">
+            <button class="btn btn-secondary" id="copyDebugBtn" type="button">复制调试信息</button>
+            <button class="btn btn-secondary" id="clearDebugBtn" type="button">清空调试</button>
+          </div>
+          <div class="debug-list">
+            <div class="debug-box" id="debugBox">暂无调试信息。</div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <div class="contact-card">
+    <strong>充值找客服</strong>
+    加微信 qqqqq663252
+  </div>
+
+  <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true">
+    <div class="confirm-dialog">
+      <header>
+        <h2 class="section-title">确认提交任务 <span>生成前预览</span></h2>
+      </header>
+      <div class="confirm-body" id="confirmBody"></div>
+      <footer>
+        <button class="btn btn-secondary" id="cancelConfirmBtn" type="button">取消</button>
+        <button class="btn btn-primary" id="confirmSubmitBtn" type="button">确认生成</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      apiKey: "xiaolin_wuyou_api_key_v1",
+      prompt: "xiaolin_wuyou_prompt_v1",
+      references: "xiaolin_wuyou_references_v1",
+      queue: "xiaolin_wuyou_queue_v1",
+      history: "xiaolin_wuyou_history_v1",
+      settings: "xiaolin_wuyou_settings_v1",
+      savedPrompts: "xiaolin_wuyou_saved_prompts_v1",
+      batchPrompts: "xiaolin_wuyou_batch_prompts_v1",
+      userProfile: "xiaolin_wuyou_user_profile_v1",
+      library: "xiaolin_wuyou_library_v1",
+      stats: "xiaolin_wuyou_stats_v1",
+      appToken: "xiaolin_wuyou_app_token_v1",
+      projects: "xiaolin_wuyou_projects_v1",
+      promptVersions: "xiaolin_wuyou_prompt_versions_v1",
+      debugLogs: "xiaolin_wuyou_debug_logs_v1",
+    };
+    const MAX_REFERENCES = 5;
+    const MAX_HISTORY = 80;
+    const MAX_RETRIES = 2;
+
+    const form = document.getElementById("generateForm");
+    const apiKeyInput = document.getElementById("apiKeyInput");
+    const saveApiKeyBtn = document.getElementById("saveApiKeyBtn");
+    const apiKeyHint = document.getElementById("apiKeyHint");
+    const loginField = document.getElementById("loginField");
+    const appPasswordInput = document.getElementById("appPasswordInput");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginHint = document.getElementById("loginHint");
+    const userProfileInput = document.getElementById("userProfile");
+    const switchUserBtn = document.getElementById("switchUserBtn");
+    const projectNameInput = document.getElementById("projectName");
+    const tagInput = document.getElementById("tagInput");
+    const imageInput = document.getElementById("imageInput");
+    const uploadZone = document.getElementById("uploadZone");
+    const referenceUrlInput = document.getElementById("referenceUrl");
+    const addReferenceUrlBtn = document.getElementById("addReferenceUrlBtn");
+    const referenceList = document.getElementById("referenceList");
+    const modeNote = document.getElementById("modeNote");
+    const promptInput = document.getElementById("prompt");
+    const batchPromptsInput = document.getElementById("batchPrompts");
+    const savePromptBtn = document.getElementById("savePromptBtn");
+    const enhancePromptBtn = document.getElementById("enhancePromptBtn");
+    const expandPromptBtn = document.getElementById("expandPromptBtn");
+    const clearSavedPromptsBtn = document.getElementById("clearSavedPromptsBtn");
+    const savedPromptsEl = document.getElementById("savedPrompts");
+    const presetSelect = document.getElementById("presetSelect");
+    const cleanupHoursSelect = document.getElementById("cleanupHours");
+    const negativePromptInput = document.getElementById("negativePrompt");
+    const sizeSelect = document.getElementById("size");
+    const aspectSelect = document.getElementById("aspectRatio");
+    const customSizeGroup = document.getElementById("customSizeGroup");
+    const customWidth = document.getElementById("customWidth");
+    const customHeight = document.getElementById("customHeight");
+    const taskCountInput = document.getElementById("taskCount");
+    const concurrencyInput = document.getElementById("concurrency");
+    const compressQualitySelect = document.getElementById("compressQuality");
+    const maxImageSideSelect = document.getElementById("maxImageSide");
+    const watermarkTextInput = document.getElementById("watermarkText");
+    const fileNamePatternSelect = document.getElementById("fileNamePattern");
+    const dailyQuotaInput = document.getElementById("dailyQuota");
+    const unitCostInput = document.getElementById("unitCost");
+    const cropBeforeUploadInput = document.getElementById("cropBeforeUpload");
+    const canvasEditor = document.getElementById("canvasEditor");
+    const editCanvas = document.getElementById("editCanvas");
+    const rotateImageBtn = document.getElementById("rotateImageBtn");
+    const cropSquareBtn = document.getElementById("cropSquareBtn");
+    const applyEditBtn = document.getElementById("applyEditBtn");
+    const notifyDoneInput = document.getElementById("notifyDone");
+    const debugPayloadBtn = document.getElementById("debugPayloadBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const resultGrid = document.getElementById("resultGrid");
+    const placeholder = document.getElementById("placeholder");
+    const message = document.getElementById("message");
+    const taskIdText = document.getElementById("taskIdText");
+    const configDot = document.getElementById("configDot");
+    const configText = document.getElementById("configText");
+    const queueList = document.getElementById("queueList");
+    const queueStats = document.getElementById("queueStats");
+    const historyList = document.getElementById("historyList");
+    const historyStats = document.getElementById("historyStats");
+    const pauseQueueBtn = document.getElementById("pauseQueueBtn");
+    const resumeQueueBtn = document.getElementById("resumeQueueBtn");
+    const retryFailedBtn = document.getElementById("retryFailedBtn");
+    const clearQueueBtn = document.getElementById("clearQueueBtn");
+    const downloadAllBtn = document.getElementById("downloadAllBtn");
+    const zipQueueBtn = document.getElementById("zipQueueBtn");
+    const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+    const downloadHistoryBtn = document.getElementById("downloadHistoryBtn");
+    const zipHistoryBtn = document.getElementById("zipHistoryBtn");
+    const exportDataBtn = document.getElementById("exportDataBtn");
+    const importDataBtn = document.getElementById("importDataBtn");
+    const importDataInput = document.getElementById("importDataInput");
+    const historySearchInput = document.getElementById("historySearch");
+    const historyFilterSelect = document.getElementById("historyFilter");
+    const libraryStats = document.getElementById("libraryStats");
+    const libraryList = document.getElementById("libraryList");
+    const libraryFilterInput = document.getElementById("libraryFilter");
+    const clearLibraryBtn = document.getElementById("clearLibraryBtn");
+    const dedupeLibraryBtn = document.getElementById("dedupeLibraryBtn");
+    const statsText = document.getElementById("statsText");
+    const adminList = document.getElementById("adminList");
+    const refreshAdminBtn = document.getElementById("refreshAdminBtn");
+    const cleanupUploadsBtn = document.getElementById("cleanupUploadsBtn");
+    const rerunFilteredBtn = document.getElementById("rerunFilteredBtn");
+    const syncStateBtn = document.getElementById("syncStateBtn");
+    const debugStats = document.getElementById("debugStats");
+    const debugBox = document.getElementById("debugBox");
+    const copyDebugBtn = document.getElementById("copyDebugBtn");
+    const clearDebugBtn = document.getElementById("clearDebugBtn");
+    const confirmModal = document.getElementById("confirmModal");
+    const confirmBody = document.getElementById("confirmBody");
+    const cancelConfirmBtn = document.getElementById("cancelConfirmBtn");
+    const confirmSubmitBtn = document.getElementById("confirmSubmitBtn");
+
+    let hasEnvApiKey = false;
+    let referenceImages = [];
+    let queue = [];
+    let history = [];
+    let savedPrompts = [];
+    let imageLibrary = [];
+    let usageStats = {};
+    let projects = [];
+    let promptVersions = [];
+    let debugLogs = [];
+    let authRequired = false;
+    let hasDatabase = false;
+    let lastPreparedDataUrl = "";
+    let pendingEditResolve = null;
+    let syncTimer = null;
+    let queuePaused = false;
+    let activeCount = 0;
+    let pendingSubmitPlan = null;
+
+    init();
+
+    async function init() {
+      loadLocalState();
+      bindEvents();
+      renderAll();
+      await checkConfig();
+      await loadRemoteState();
+      refreshAdminStatus();
+      registerPwa();
+      startQueue();
+    }
+
+    function bindEvents() {
+      loginBtn.addEventListener("click", loginApp);
+      switchUserBtn.addEventListener("click", switchUserProfile);
+      saveApiKeyBtn.addEventListener("click", saveApiKey);
+      apiKeyInput.addEventListener("input", () => {
+        writeStorage(STORAGE_KEYS.apiKey, apiKeyInput.value.trim());
+        updateApiState();
+      });
+
+      promptInput.addEventListener("input", () => {
+        writeStorage(STORAGE_KEYS.prompt, promptInput.value);
+      });
+      batchPromptsInput.addEventListener("input", () => {
+        writeStorage(STORAGE_KEYS.batchPrompts, batchPromptsInput.value);
+      });
+      savePromptBtn.addEventListener("click", saveCurrentPrompt);
+      enhancePromptBtn.addEventListener("click", enhancePrompt);
+      expandPromptBtn.addEventListener("click", expandPromptVariablesToBatch);
+      clearSavedPromptsBtn.addEventListener("click", clearSavedPrompts);
+      presetSelect.addEventListener("change", applyPreset);
+
+      [sizeSelect, aspectSelect, customWidth, customHeight, taskCountInput, concurrencyInput, compressQualitySelect, maxImageSideSelect, watermarkTextInput, fileNamePatternSelect, dailyQuotaInput, unitCostInput, cleanupHoursSelect, cropBeforeUploadInput, notifyDoneInput, negativePromptInput, projectNameInput, tagInput].forEach((element) => {
+        element.addEventListener("change", saveSettings);
+        element.addEventListener("input", saveSettings);
+      });
+      promptInput.addEventListener("change", rememberPromptVersion);
+
+      uploadZone.addEventListener("click", (event) => {
+        if (event.target !== imageInput) imageInput.click();
+      });
+      uploadZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        uploadZone.classList.add("dragging");
+      });
+      uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("dragging"));
+      uploadZone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        uploadZone.classList.remove("dragging");
+        const files = Array.from(event.dataTransfer.files || []);
+        if (files.length) handleImageFiles(files);
+      });
+      imageInput.addEventListener("change", (event) => {
+        const files = Array.from(event.target.files || []);
+        if (files.length) handleImageFiles(files);
+        imageInput.value = "";
+      });
+
+      addReferenceUrlBtn.addEventListener("click", addManualReferenceUrl);
+      referenceUrlInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          addManualReferenceUrl();
+        }
+      });
+
+      sizeSelect.addEventListener("change", updateModeFromReferences);
+      resetBtn.addEventListener("click", resetCurrentForm);
+      form.addEventListener("submit", handleSubmit);
+      pauseQueueBtn.addEventListener("click", pauseQueue);
+      resumeQueueBtn.addEventListener("click", resumeQueue);
+      retryFailedBtn.addEventListener("click", retryFailedTasks);
+      clearQueueBtn.addEventListener("click", clearFinishedQueue);
+      downloadAllBtn.addEventListener("click", () => downloadUrls(collectQueueResultUrls()));
+      zipQueueBtn.addEventListener("click", () => downloadZip(collectQueueResultUrls(), "queue"));
+      clearHistoryBtn.addEventListener("click", clearHistory);
+      downloadHistoryBtn.addEventListener("click", () => downloadUrls(collectHistoryResultUrls()));
+      zipHistoryBtn.addEventListener("click", () => downloadZip(collectHistoryResultUrls(), "history"));
+      exportDataBtn.addEventListener("click", exportData);
+      importDataBtn.addEventListener("click", () => importDataInput.click());
+      importDataInput.addEventListener("change", importDataFromFile);
+      historySearchInput.addEventListener("input", renderHistory);
+      historyFilterSelect.addEventListener("change", renderHistory);
+      libraryFilterInput.addEventListener("input", renderLibrary);
+      clearLibraryBtn.addEventListener("click", clearLibrary);
+      dedupeLibraryBtn.addEventListener("click", dedupeLibrary);
+      refreshAdminBtn.addEventListener("click", refreshAdminStatus);
+      cleanupUploadsBtn.addEventListener("click", cleanupUploads);
+      rerunFilteredBtn.addEventListener("click", rerunFilteredHistory);
+      syncStateBtn.addEventListener("click", syncStateToDatabase);
+      rotateImageBtn.addEventListener("click", rotatePreparedImage);
+      cropSquareBtn.addEventListener("click", cropPreparedImageSquare);
+      applyEditBtn.addEventListener("click", applyPreparedImageEdit);
+      debugPayloadBtn.addEventListener("click", showCurrentPayloadDebug);
+      copyDebugBtn.addEventListener("click", () => copyText(debugLogs.map((item) => `[${new Date(item.createdAt).toLocaleString()}] ${item.title}\n${item.detail}`).join("\n\n")));
+      clearDebugBtn.addEventListener("click", clearDebugLogs);
+      cancelConfirmBtn.addEventListener("click", closeConfirmModal);
+      confirmSubmitBtn.addEventListener("click", confirmPendingSubmit);
+    }
+
+    async function checkConfig() {
+      try {
+        const response = await fetch("/api/config");
+        const data = await response.json();
+        hasEnvApiKey = Boolean(data.hasApiKey);
+        authRequired = Boolean(data.authRequired);
+        hasDatabase = Boolean(data.hasDatabase);
+        loginField.style.display = authRequired && !readAppToken() ? "block" : "none";
+        updateApiState();
+        setMessage(hasUsableApiKey() ? "服务已就绪，可以提交任务。" : "请在网页填写 API Key，或在 .env 中配置 API Key。", hasUsableApiKey() ? "success" : "error");
+      } catch {
+        hasEnvApiKey = false;
+        updateApiState();
+        setMessage("无法连接本地服务，请确认 start-server.cmd 正在运行。", "error");
+      }
+    }
+
+    async function loginApp() {
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: appPasswordInput.value }),
+        });
+        const data = await safeJson(response);
+        if (!response.ok || data.error) throw new Error(readErrorMessage(data, "登录失败"));
+        localStorage.setItem(STORAGE_KEYS.appToken, data.token || "");
+        loginField.style.display = "none";
+        loginHint.textContent = "已登录。";
+        setMessage("访问密码已通过。", "success");
+        await loadRemoteState();
+        refreshAdminStatus();
+      } catch (error) {
+        setMessage(error.message || "登录失败。", "error");
+      }
+    }
+
+    async function loadRemoteState() {
+      if (!hasDatabase || (authRequired && !readAppToken())) return;
+      try {
+        const response = await fetch(`/api/state?user=${encodeURIComponent(getCurrentUser())}`, {
+          headers: authHeaders(),
+        });
+        const data = await safeJson(response);
+        if (!response.ok || data.error) throw new Error(readErrorMessage(data, "读取数据库状态失败"));
+        if (!data.data || !Object.keys(data.data).length) {
+          await syncStateToDatabase(false);
+          return;
+        }
+        applyImportedData(data.data);
+        renderAll();
+        setMessage("已从 SQLite 数据库恢复本用户数据。", "success");
+      } catch (error) {
+        if (/需要访问密码|401/.test(error.message || "")) {
+          localStorage.removeItem(STORAGE_KEYS.appToken);
+          loginField.style.display = "block";
+        }
+        addDebugLog("数据库读取失败", error.message || String(error));
+      }
+    }
+
+    async function syncStateToDatabase(showMessage = true) {
+      if (!hasDatabase || (authRequired && !readAppToken())) {
+        if (showMessage) setMessage("数据库不可用，或需要先输入访问密码。", "error");
+        return;
+      }
+      try {
+        const response = await fetch("/api/state", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ user: getCurrentUser(), data: collectExportData() }),
+        });
+        const data = await safeJson(response);
+        if (!response.ok || data.error) throw new Error(readErrorMessage(data, "同步数据库失败"));
+        if (showMessage) setMessage("已同步到 SQLite 数据库。", "success");
+      } catch (error) {
+        if (/需要访问密码|401/.test(error.message || "")) {
+          localStorage.removeItem(STORAGE_KEYS.appToken);
+          loginField.style.display = "block";
+        }
+        setMessage(error.message || "同步数据库失败。", "error");
+      }
+    }
+
+    function updateApiState() {
+      const hasBrowserKey = Boolean(readApiKey());
+      const ready = hasBrowserKey || hasEnvApiKey;
+      configDot.classList.toggle("ready", ready);
+      configText.textContent = ready ? (hasBrowserKey ? "API 已保存" : "使用 .env API") : "API 未配置";
+      apiKeyHint.textContent = hasBrowserKey
+        ? "API Key 已保存在当前浏览器，刷新不会丢失。"
+        : hasEnvApiKey
+        ? "当前使用 .env 中的 API Key，也可以在这里填写覆盖。"
+        : "请填写 VModel API Key。";
+    }
+
+    function authHeaders(extra = {}) {
+      return {
+        "Content-Type": "application/json",
+        ...(readAppToken() ? { "X-App-Token": readAppToken() } : {}),
+        ...extra,
+      };
+    }
+
+    function readAppToken() {
+      return String(localStorage.getItem(STORAGE_KEYS.appToken) || "").trim();
+    }
+
+    function saveApiKey() {
+      writeStorage(STORAGE_KEYS.apiKey, apiKeyInput.value.trim());
+      updateApiState();
+      setMessage("API Key 已保存到当前浏览器。", "success");
+    }
+
+    function loadLocalState() {
+      userProfileInput.value = getCurrentUser();
+      apiKeyInput.value = readStorage(STORAGE_KEYS.apiKey) || "";
+      promptInput.value = readStorage(STORAGE_KEYS.prompt) || "";
+      batchPromptsInput.value = readStorage(STORAGE_KEYS.batchPrompts) || "";
+      referenceImages = readJson(STORAGE_KEYS.references, []).filter((item) => item && item.url).slice(0, MAX_REFERENCES);
+      queue = readJson(STORAGE_KEYS.queue, []).map(normalizeSavedTask);
+      history = readJson(STORAGE_KEYS.history, []);
+      savedPrompts = readJson(STORAGE_KEYS.savedPrompts, []);
+      imageLibrary = readJson(STORAGE_KEYS.library, []);
+      usageStats = readJson(STORAGE_KEYS.stats, {});
+      projects = readJson(STORAGE_KEYS.projects, []);
+      promptVersions = readJson(STORAGE_KEYS.promptVersions, []);
+      debugLogs = readJson(STORAGE_KEYS.debugLogs, []);
+
+      const settings = readJson(STORAGE_KEYS.settings, {});
+      projectNameInput.value = settings.projectName || "";
+      tagInput.value = settings.tags || "";
+      if (settings.size) sizeSelect.value = settings.size;
+      if (settings.aspectRatio) aspectSelect.value = settings.aspectRatio;
+      if (settings.customWidth) customWidth.value = settings.customWidth;
+      if (settings.customHeight) customHeight.value = settings.customHeight;
+      if (settings.taskCount) taskCountInput.value = settings.taskCount;
+      if (settings.concurrency) concurrencyInput.value = settings.concurrency;
+      if (settings.compressQuality) compressQualitySelect.value = settings.compressQuality;
+      if (settings.maxImageSide) maxImageSideSelect.value = settings.maxImageSide;
+      if (settings.negativePrompt) negativePromptInput.value = settings.negativePrompt;
+      if (settings.watermarkText) watermarkTextInput.value = settings.watermarkText;
+      if (settings.fileNamePattern) fileNamePatternSelect.value = settings.fileNamePattern;
+      if (typeof settings.dailyQuota !== "undefined") dailyQuotaInput.value = settings.dailyQuota;
+      if (typeof settings.unitCost !== "undefined") unitCostInput.value = settings.unitCost;
+      if (settings.cleanupHours) cleanupHoursSelect.value = settings.cleanupHours;
+      cropBeforeUploadInput.checked = Boolean(settings.cropBeforeUpload);
+      notifyDoneInput.checked = Boolean(settings.notifyDone);
+      updateModeFromReferences();
+    }
+
+    function normalizeSavedTask(task) {
+      if (["running", "queued"].includes(task.status)) {
+        return { ...task, status: "queued", taskId: "", message: "等待重新调度" };
+      }
+      return task;
+    }
+
+    function saveSettings() {
+      const settings = {
+        size: sizeSelect.value,
+        aspectRatio: aspectSelect.value,
+        customWidth: customWidth.value,
+        customHeight: customHeight.value,
+        taskCount: taskCountInput.value,
+        concurrency: concurrencyInput.value,
+        compressQuality: compressQualitySelect.value,
+        maxImageSide: maxImageSideSelect.value,
+        projectName: projectNameInput.value,
+        tags: tagInput.value,
+      };
+      settings.negativePrompt = negativePromptInput.value;
+      settings.watermarkText = watermarkTextInput.value;
+      settings.fileNamePattern = fileNamePatternSelect.value;
+      settings.dailyQuota = dailyQuotaInput.value;
+      settings.unitCost = unitCostInput.value;
+      settings.cleanupHours = cleanupHoursSelect.value;
+      settings.cropBeforeUpload = cropBeforeUploadInput.checked;
+      settings.notifyDone = notifyDoneInput.checked;
+      writeStorage(STORAGE_KEYS.settings, JSON.stringify(settings));
+      persistProjects();
+      updateModeFromReferences();
+      startQueue();
+    }
+
+    function persistReferences() {
+      writeStorage(STORAGE_KEYS.references, JSON.stringify(referenceImages));
+      scheduleStateSync();
+    }
+
+    function persistQueue() {
+      writeStorage(STORAGE_KEYS.queue, JSON.stringify(queue));
+      scheduleStateSync();
+    }
+
+    function persistHistory() {
+      writeStorage(STORAGE_KEYS.history, JSON.stringify(history.slice(0, MAX_HISTORY)));
+      scheduleStateSync();
+    }
+
+    function persistSavedPrompts() {
+      writeStorage(STORAGE_KEYS.savedPrompts, JSON.stringify(savedPrompts.slice(0, 60)));
+      scheduleStateSync();
+    }
+
+    function persistLibrary() {
+      writeStorage(STORAGE_KEYS.library, JSON.stringify(imageLibrary.slice(0, 120)));
+      scheduleStateSync();
+    }
+
+    function persistStats() {
+      writeStorage(STORAGE_KEYS.stats, JSON.stringify(usageStats));
+      scheduleStateSync();
+    }
+
+    function persistProjects() {
+      const name = projectNameInput.value.trim();
+      if (name) {
+        projects = [name, ...projects.filter((item) => item !== name)].slice(0, 80);
+        writeStorage(STORAGE_KEYS.projects, JSON.stringify(projects));
+        scheduleStateSync();
+      }
+    }
+
+    function persistPromptVersions() {
+      writeStorage(STORAGE_KEYS.promptVersions, JSON.stringify(promptVersions.slice(0, 100)));
+      scheduleStateSync();
+    }
+
+    function persistDebugLogs() {
+      writeStorage(STORAGE_KEYS.debugLogs, JSON.stringify(debugLogs.slice(0, 80)));
+    }
+
+    function scheduleStateSync() {
+      if (!hasDatabase || (authRequired && !readAppToken())) return;
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(() => syncStateToDatabase(false), 1200);
+    }
+
+    function saveCurrentPrompt() {
+      const prompt = promptInput.value.trim();
+      if (!prompt) {
+        setMessage("请先填写提示词再收藏。", "error");
+        return;
+      }
+      savedPrompts = [prompt, ...savedPrompts.filter((item) => item !== prompt)].slice(0, 60);
+      persistSavedPrompts();
+      renderSavedPrompts();
+      setMessage("提示词已收藏。", "success");
+    }
+
+    function clearSavedPrompts() {
+      savedPrompts = [];
+      persistSavedPrompts();
+      renderSavedPrompts();
+      setMessage("提示词收藏已清空。", "success");
+    }
+
+    async function handleImageFiles(files) {
+      const remainingSlots = MAX_REFERENCES - referenceImages.length;
+      if (remainingSlots <= 0) {
+        setMessage("最多只能添加 5 张参考图。", "error");
+        return;
+      }
+
+      const selectedFiles = files.slice(0, remainingSlots);
+      if (files.length > remainingSlots) {
+        setMessage(`最多只能添加 5 张参考图，已忽略 ${files.length - remainingSlots} 张。`, "error");
+      }
+
+      if (cropBeforeUploadInput.checked) {
+        for (const file of selectedFiles) {
+          await handleImageFile(file);
+        }
+      } else {
+        await Promise.all(selectedFiles.map(handleImageFile));
+      }
+    }
+
+    async function handleImageFile(file) {
+      if (!file.type.startsWith("image/")) {
+        setMessage("请选择图片文件。", "error");
+        return;
+      }
+
+      if (file.size > 8 * 1024 * 1024) {
+        setMessage("单张图片不能超过 8MB。请压缩图片或减少参考图数量。", "error");
+        return;
+      }
+
+      const item = {
+        id: createId(),
+        name: file.name || "reference.png",
+        previewUrl: "",
+        url: "",
+        status: "uploading",
+        error: "",
+        role: "reference",
+      };
+      referenceImages.push(item);
+      renderAll();
+      setMessage(`正在上传参考图：${item.name}`, "loading");
+
+      try {
+        const dataUrl = await prepareImageDataUrl(file);
+        item.previewUrl = dataUrl;
+        renderReferences();
+
+        const response = await fetch("/api/upload-local", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ dataUrl, fileName: item.name }),
+        });
+        const data = await safeJson(response);
+        if (!response.ok || data.error) {
+          throw new Error(readErrorMessage(data, `上传失败 (${response.status})`));
+        }
+        if (!/^https?:\/\/\S+/i.test(data.referenceUrl || "")) {
+          throw new Error("图片已保存，但没有拿到可用于 VModel 的公网 URL。");
+        }
+
+        item.url = data.referenceUrl;
+        item.status = "success";
+        item.error = "";
+        addLibraryImage({
+          name: item.name,
+          note: item.note || "",
+          project: currentProject(),
+          tags: currentTags(),
+          previewUrl: item.previewUrl,
+          url: item.url,
+          source: "upload",
+        });
+        setMessage(`参考图已上传：当前会发送 ${getReadyReferenceUrls().length} 张参考图。`, "success");
+      } catch (error) {
+        item.status = "error";
+        item.error = error.message || "上传本地图片失败。";
+        setMessage(item.error, "error");
+      } finally {
+        persistReferences();
+        renderAll();
+      }
+    }
+
+    function addManualReferenceUrl() {
+      const url = referenceUrlInput.value.trim();
+      if (!url) return;
+      if (!/^https?:\/\/\S+/i.test(url)) {
+        setMessage("参考图 URL 必须以 http:// 或 https:// 开头。", "error");
+        return;
+      }
+      if (referenceImages.length >= MAX_REFERENCES) {
+        setMessage("最多只能添加 5 张参考图。", "error");
+        return;
+      }
+      referenceImages.push({
+        id: createId(),
+        name: "手动 URL",
+        previewUrl: url,
+        url,
+        status: "success",
+        error: "",
+        role: "reference",
+      });
+      referenceUrlInput.value = "";
+      persistReferences();
+      renderAll();
+      setMessage(`已添加参考图 URL：当前会发送 ${getReadyReferenceUrls().length} 张参考图。`, "success");
+    }
+
+    function removeReference(id) {
+      referenceImages = referenceImages.filter((item) => item.id !== id);
+      persistReferences();
+      renderAll();
+    }
+
+    function updateModeFromReferences() {
+      const readyCount = getReadyReferenceUrls().length;
+      const uploadingCount = referenceImages.filter((item) => item.status === "uploading").length;
+      modeNote.textContent = readyCount
+        ? `当前为图生图模式。将发送 ${readyCount} 张参考图，宽高比可手动选择。`
+        : uploadingCount
+        ? `正在上传 ${uploadingCount} 张参考图，上传完成后进入图生图模式。`
+        : "当前为文生图模式。上传或添加参考图后自动进入图生图模式。";
+      customSizeGroup.style.display = sizeSelect.value === "custom" ? "grid" : "none";
+    }
+
+    function getReadyReferenceUrls() {
+      return referenceImages
+        .filter((item) => item.status === "success" && /^https?:\/\/\S+/i.test(item.url || ""))
+        .map((item) => item.url)
+        .slice(0, MAX_REFERENCES);
+    }
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      openSubmitPreview(false);
+    }
+
+    function enqueueFromCurrentForm(runImmediately) {
+      const plan = createSubmitPlan(runImmediately);
+      if (!plan) return;
+      enqueueSubmitPlan(plan);
+    }
+
+    function createSubmitPlan(runImmediately) {
+      if (!hasUsableApiKey()) {
+        setMessage("请先填写并保存 API Key，或在 .env 中配置 API Key。", "error");
+        apiKeyInput.focus();
+        return null;
+      }
+
+      const prompt = promptInput.value.trim();
+      const batchPrompts = batchPromptsInput.value
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+      if (!prompt && !batchPrompts.length) {
+        setMessage("请填写提示词。", "error");
+        promptInput.focus();
+        return null;
+      }
+
+      const uploadingCount = referenceImages.filter((item) => item.status === "uploading").length;
+      if (uploadingCount > 0) {
+        setMessage(`还有 ${uploadingCount} 张参考图正在上传，完成后再提交。`, "error");
+        return null;
+      }
+
+      if (referenceImages.length > 0 && getReadyReferenceUrls().length === 0) {
+        setMessage("已添加参考图，但没有可发送给 VModel 的公网 URL。请删除失败项或重新上传。", "error");
+        return null;
+      }
+
+      const prompts = expandPromptVariables(batchPrompts.length ? batchPrompts : [prompt]);
+      const repeatCount = runImmediately || batchPrompts.length ? 1 : clampNumber(taskCountInput.value, 1, 20, 1);
+      const plannedCount = prompts.length * repeatCount;
+      const quotaError = checkDailyQuota(plannedCount);
+      if (quotaError) {
+        setMessage(quotaError, "error");
+        return null;
+      }
+      const tasks = [];
+      prompts.forEach((taskPrompt) => {
+        const input = buildInputPayload(taskPrompt);
+        const snapshot = buildTaskSnapshot(taskPrompt, input);
+        for (let index = 0; index < repeatCount; index += 1) {
+          tasks.push({ input, snapshot });
+        }
+      });
+
+      return {
+        prompt: prompt || prompts[0],
+        prompts,
+        tasks,
+        repeatCount,
+        referenceCount: getReadyReferenceUrls().length,
+        size: sizeSelect.value,
+        aspectRatio: aspectSelect.value,
+      };
+    }
+
+    function enqueueSubmitPlan(plan) {
+      plan.tasks.forEach(({ snapshot }) => {
+        queue.unshift({
+          id: createId(),
+          createdAt: Date.now(),
+          status: "queued",
+          retryCount: 0,
+          taskId: "",
+          message: "等待生成",
+          resultUrls: [],
+          error: "",
+          paused: false,
+          cancelled: false,
+          ...snapshot,
+        });
+      });
+
+      incrementStats("submitted", plan.tasks.length);
+      writeStorage(STORAGE_KEYS.prompt, plan.prompt);
+      persistQueue();
+      renderAll();
+      setMessage(`已加入 ${plan.tasks.length} 个任务，队列会自动并发生成。`, "success");
+      startQueue();
+    }
+
+    function openSubmitPreview(runImmediately) {
+      const plan = createSubmitPlan(runImmediately);
+      if (!plan) return;
+      pendingSubmitPlan = plan;
+      confirmBody.innerHTML = "";
+      [
+        ["任务数量", `${plan.tasks.length} 个`],
+        ["提示词", plan.prompts.slice(0, 5).join(" / ") + (plan.prompts.length > 5 ? ` 等 ${plan.prompts.length} 条` : "")],
+        ["参考图", `${plan.referenceCount} 张`],
+        ["分辨率", plan.size],
+        ["宽高比", plan.aspectRatio === "match_input_image" ? "跟随参考图" : plan.aspectRatio],
+        ["并发数量", `${clampNumber(concurrencyInput.value, 1, 5, 2)} 个`],
+      ].forEach(([label, value]) => {
+        const row = document.createElement("div");
+        row.className = "confirm-row";
+        row.innerHTML = `<strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span>`;
+        confirmBody.append(row);
+      });
+      confirmModal.classList.add("open");
+    }
+
+    function closeConfirmModal() {
+      confirmModal.classList.remove("open");
+      pendingSubmitPlan = null;
+    }
+
+    function confirmPendingSubmit() {
+      if (!pendingSubmitPlan) return;
+      enqueueSubmitPlan(pendingSubmitPlan);
+      closeConfirmModal();
+    }
+
+    function buildTaskSnapshot(prompt, input) {
+      return {
+        prompt,
+        input,
+        references: referenceImages
+          .filter((item) => item.status === "success" && item.url)
+          .map((item) => ({
+            id: item.id,
+            name: item.name,
+            note: item.note || "",
+            role: item.role || "reference",
+            previewUrl: item.previewUrl || item.url,
+            url: item.url,
+          })),
+        settings: {
+          projectName: currentProject(),
+          tags: currentTags(),
+          size: sizeSelect.value,
+          aspectRatio: aspectSelect.value,
+          customWidth: Number(customWidth.value),
+          customHeight: Number(customHeight.value),
+          negativePrompt: negativePromptInput.value.trim(),
+          watermarkText: watermarkTextInput.value.trim(),
+          fileNamePattern: fileNamePatternSelect.value,
+        },
+      };
+    }
+
+    function buildInputPayload(prompt) {
+      const finalPrompt = withNegativePrompt(withReferenceRolePrompt(prompt));
+      const referenceUrls = getReadyReferenceUrls();
+      if (referenceUrls.length > 0) {
+        return {
+          prompt: finalPrompt,
+          size: ["1K", "2K", "4K"].includes(sizeSelect.value) ? sizeSelect.value : "2K",
+          aspect_ratio: aspectSelect.value,
+          image_input: referenceUrls,
+        };
+      }
+
+      if (sizeSelect.value === "custom") {
+        return {
+          prompt: finalPrompt,
+          size: "custom",
+          width: Number(customWidth.value),
+          height: Number(customHeight.value),
+        };
+      }
+
+      return {
+        prompt: finalPrompt,
+        size: sizeSelect.value,
+        aspect_ratio: aspectSelect.value === "match_input_image" ? "1:1" : aspectSelect.value,
+      };
+    }
+
+    function withNegativePrompt(prompt) {
+      const negative = negativePromptInput.value.trim();
+      return negative ? `${prompt}\n\n避免：${negative}` : prompt;
+    }
+
+    function withReferenceRolePrompt(prompt) {
+      const details = referenceImages
+        .filter((item) => item.status === "success")
+        .map((item, index) => {
+          const role = roleLabel(item.role || "reference");
+          const note = item.note ? `，${item.note}` : "";
+          return `参考图${index + 1}用于${role}${note}`;
+        });
+      return details.length ? `${prompt}\n\n参考图说明：${details.join("；")}` : prompt;
+    }
+
+    function roleLabel(role) {
+      return {
+        reference: "整体参考",
+        face: "脸部/人物一致性",
+        pose: "姿势动作",
+        clothes: "服装款式",
+        background: "背景环境",
+        style: "画面风格",
+      }[role] || "整体参考";
+    }
+
+    function expandPromptVariables(prompts) {
+      return prompts.flatMap((prompt) => {
+        const match = /\{([^{}]+)\}/.exec(prompt);
+        if (!match) return [prompt];
+        return match[1]
+          .split("|")
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .flatMap((part) => expandPromptVariables([prompt.slice(0, match.index) + part + prompt.slice(match.index + match[0].length)]));
+      }).slice(0, 80);
+    }
+
+    function expandPromptVariablesToBatch() {
+      const prompt = promptInput.value.trim();
+      if (!prompt) {
+        setMessage("请先输入带变量的提示词。", "error");
+        return;
+      }
+      const expanded = expandPromptVariables([prompt]);
+      batchPromptsInput.value = expanded.join("\n");
+      writeStorage(STORAGE_KEYS.batchPrompts, batchPromptsInput.value);
+      setMessage(`已展开为 ${expanded.length} 条批量提示词。`, "success");
+    }
+
+    function applyPreset() {
+      const preset = presetSelect.value;
+      if (!preset) return;
+      const configs = {
+        portrait: { size: "2K", ratio: "3:4", add: "自然人像写真，皮肤真实，眼神清晰，柔和布光" },
+        product: { size: "2K", ratio: "1:1", add: "电商产品图，主体居中，背景干净，商业摄影，细节清楚" },
+        avatar: { size: "2K", ratio: "1:1", add: "头像，面部清晰，干净背景，适合社交媒体" },
+        realphoto: { size: "4K", ratio: "3:2", add: "写实摄影，真实光影，镜头质感，自然色彩" },
+        poster: { size: "2K", ratio: "16:9", add: "海报主图，构图有层次，视觉中心明确，留白适合排版" },
+      };
+      const config = configs[preset];
+      sizeSelect.value = config.size;
+      aspectSelect.value = config.ratio;
+      if (promptInput.value.trim() && !promptInput.value.includes(config.add)) {
+        promptInput.value = `${promptInput.value.trim()}，${config.add}`;
+        writeStorage(STORAGE_KEYS.prompt, promptInput.value);
+      }
+      saveSettings();
+      setMessage("预设已应用。", "success");
+    }
+
+    function startQueue() {
+      if (queuePaused) {
+        renderQueue();
+        return;
+      }
+      const concurrency = clampNumber(concurrencyInput.value, 1, 5, 2);
+      while (activeCount < concurrency) {
+        const nextTask = queue.find((task) => task.status === "queued");
+        if (!nextTask) break;
+        runQueueTask(nextTask);
+      }
+      renderQueue();
+    }
+
+    async function runQueueTask(task) {
+      activeCount += 1;
+      task.status = "running";
+      task.message = task.retryCount ? `重试中，第 ${task.retryCount + 1} 次` : "创建任务中";
+      task.error = "";
+      persistQueue();
+      renderAll();
+
+      try {
+        const createData = await createRemoteTask(task.input);
+        const taskId = readTaskId(createData);
+        if (!taskId) throw new Error("接口没有返回 task_id。");
+
+        task.taskId = taskId;
+        task.message = `任务 ${taskId} 生成中`;
+        persistQueue();
+        renderAll();
+
+        const imageUrls = await pollTaskForQueue(task);
+        if (task.cancelled) throw new Error("任务已取消。");
+        task.status = "done";
+        task.message = `生成成功，共 ${imageUrls.length} 张`;
+        task.resultUrls = imageUrls;
+        addHistory(task);
+        renderResults(imageUrls, task.prompt);
+        taskIdText.textContent = `任务 ${task.taskId}`;
+        setMessage(task.message, "success");
+        notifyTaskDone(task);
+      } catch (error) {
+        const messageText = error.message || "生成失败。";
+        if (task.cancelled) {
+          task.status = "failed";
+          task.error = "已取消";
+          task.message = "已取消";
+        } else if (task.retryCount < MAX_RETRIES) {
+          task.retryCount += 1;
+          task.status = "queued";
+          task.message = `失败后自动重试：${messageText}`;
+        } else {
+          task.status = "failed";
+          task.error = messageText;
+          task.message = messageText;
+          incrementStats("failed");
+          setMessage(messageText, "error");
+        }
+      } finally {
+        activeCount = Math.max(0, activeCount - 1);
+        persistQueue();
+        renderAll();
+        startQueue();
+      }
+    }
+
+    function pauseQueue() {
+      queuePaused = true;
+      setMessage("队列已暂停，正在运行的任务会继续查询结果。", "success");
+      renderQueue();
+    }
+
+    function resumeQueue() {
+      queuePaused = false;
+      setMessage("队列已继续。", "success");
+      startQueue();
+    }
+
+    function cancelTask(taskId) {
+      const task = queue.find((item) => item.id === taskId);
+      if (!task) return;
+      task.cancelled = true;
+      if (task.status === "queued" || task.status === "failed") {
+        task.status = "failed";
+        task.message = "已取消";
+        task.error = "已取消";
+      } else if (task.status === "running") {
+        task.message = "已标记取消，停止后不再重试";
+      }
+      persistQueue();
+      renderAll();
+    }
+
+    async function createRemoteTask(input) {
+      addDebugLog("创建任务参数", JSON.stringify({ input }, null, 2));
+      const response = await fetch("/api/create", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          input,
+          token: readApiKey(),
+        }),
+      });
+      const data = await safeJson(response);
+      addDebugLog("创建任务响应", JSON.stringify(data, null, 2));
+      if (!response.ok || isApiError(data)) {
+        throw new Error(readErrorMessage(data, `创建任务失败 (${response.status})`));
+      }
+      return data;
+    }
+
+    async function pollTaskForQueue(task, maxAttempts = 90, interval = 2000) {
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        if (task.cancelled) throw new Error("任务已取消。");
+        await sleep(interval);
+        const response = await fetch(`/api/status/${encodeURIComponent(task.taskId)}`, {
+          headers: authHeaders(readApiKey() ? { Authorization: `Bearer ${readApiKey()}` } : {}),
+        });
+        const data = await safeJson(response);
+        if (attempt === 1 || attempt % 8 === 0) addDebugLog("查询任务响应", JSON.stringify(data, null, 2));
+        if (!response.ok || isApiError(data)) {
+          throw new Error(readErrorMessage(data, `查询任务失败 (${response.status})`));
+        }
+
+        const status = readTaskStatus(data);
+        task.message = status ? `任务状态：${status}` : `第 ${attempt} 次查询任务`;
+        persistQueue();
+        renderQueue();
+
+        if (isDoneStatus(status)) {
+          const urls = extractImageUrls(data);
+          if (!urls.length) throw new Error("任务完成，但响应中没有找到图片链接。");
+          return urls;
+        }
+
+        if (isFailedStatus(status)) {
+          throw new Error(readErrorMessage(data, "任务生成失败。"));
+        }
+      }
+      throw new Error("生成超时，请稍后重试。");
+    }
+
+    function addHistory(task) {
+      history.unshift({
+        id: createId(),
+        createdAt: Date.now(),
+        prompt: task.prompt,
+        input: task.input,
+        references: task.references,
+        settings: task.settings,
+        project: task.settings?.projectName || currentProject(),
+        tags: task.settings?.tags || currentTags(),
+        rating: 0,
+        favorite: false,
+        resultUrls: task.resultUrls,
+        taskId: task.taskId,
+      });
+      history = history.slice(0, MAX_HISTORY);
+      persistHistory();
+      task.resultUrls.forEach((url, index) => {
+        addLibraryImage({
+          name: `结果 ${index + 1}`,
+          note: task.prompt,
+          project: task.settings?.projectName || currentProject(),
+          tags: task.settings?.tags || currentTags(),
+          previewUrl: url,
+          url,
+          source: "result",
+        });
+      });
+      incrementStats("success");
+    }
+
+    function retryFailedTasks() {
+      let count = 0;
+      queue.forEach((task) => {
+        if (task.status === "failed") {
+          task.status = "queued";
+          task.cancelled = false;
+          task.retryCount = 0;
+          task.error = "";
+          task.message = "手动重新排队";
+          count += 1;
+        }
+      });
+      persistQueue();
+      renderAll();
+      setMessage(count ? `已重新排队 ${count} 个失败任务。` : "没有失败任务需要重试。", count ? "success" : "");
+      startQueue();
+    }
+
+    function clearFinishedQueue() {
+      queue = queue.filter((task) => !["done", "failed"].includes(task.status));
+      persistQueue();
+      renderAll();
+    }
+
+    function clearHistory() {
+      history = [];
+      persistHistory();
+      renderHistory();
+      setMessage("历史记录已清空。", "success");
+    }
+
+    function collectQueueResultUrls() {
+      return [...new Set(queue.flatMap((task) => task.resultUrls || []))];
+    }
+
+    function collectHistoryResultUrls() {
+      return [...new Set(getFilteredHistory().flatMap((entry) => entry.resultUrls || []))];
+    }
+
+    function addLibraryImage(image) {
+      if (!image?.url) return;
+      imageLibrary = [
+        {
+          id: createId(),
+          createdAt: Date.now(),
+          ...image,
+        },
+        ...imageLibrary.filter((item) => item.url !== image.url),
+      ].slice(0, 120);
+      persistLibrary();
+      renderLibrary();
+    }
+
+    function clearLibrary() {
+      imageLibrary = [];
+      persistLibrary();
+      renderLibrary();
+      setMessage("素材库已清空。", "success");
+    }
+
+    function dedupeLibrary() {
+      const seen = new Set();
+      imageLibrary = imageLibrary.filter((image) => {
+        const key = String(image.url || image.previewUrl || "").trim();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      persistLibrary();
+      renderLibrary();
+      setMessage("素材库已按链接去重。", "success");
+    }
+
+    function rateHistory(id, rating) {
+      const item = history.find((entry) => entry.id === id);
+      if (!item) return;
+      item.rating = clampNumber(rating, 0, 5, 0);
+      persistHistory();
+      renderHistory();
+    }
+
+    function toggleHistoryFavorite(id) {
+      const item = history.find((entry) => entry.id === id);
+      if (!item) return;
+      item.favorite = !item.favorite;
+      persistHistory();
+      renderHistory();
+    }
+
+    function currentProject() {
+      return projectNameInput.value.trim() || "默认项目";
+    }
+
+    function currentTags() {
+      return tagInput.value
+        .split(/[,，\s]+/)
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+        .slice(0, 12);
+    }
+
+    function checkDailyQuota(nextCount) {
+      const quota = clampNumber(dailyQuotaInput.value, 0, 99999, 0);
+      if (!quota) return "";
+      const today = new Date().toISOString().slice(0, 10);
+      const todayStats = usageStats[today] || { submitted: 0, success: 0, failed: 0 };
+      const used = Number(todayStats.submitted || 0);
+      if (used + nextCount > quota) {
+        return `今日配额不足：已提交 ${used} 个，计划新增 ${nextCount} 个，每日配额 ${quota} 个。`;
+      }
+      return "";
+    }
+
+    function incrementStats(type, amount = 1) {
+      const today = new Date().toISOString().slice(0, 10);
+      usageStats[today] = usageStats[today] || { submitted: 0, success: 0, failed: 0 };
+      usageStats[today][type] = (usageStats[today][type] || 0) + Math.max(0, Number(amount) || 0);
+      persistStats();
+      renderAdminSummary();
+    }
+
+    async function refreshAdminStatus() {
+      try {
+        const response = await fetch("/api/admin/status", { headers: authHeaders({}) });
+        const data = await safeJson(response);
+        if (!response.ok || data.error) throw new Error(readErrorMessage(data, "读取服务状态失败"));
+        renderAdminStatus(data);
+        setMessage("服务状态已刷新。", "success");
+      } catch (error) {
+        setMessage(error.message || "读取服务状态失败。", "error");
+      }
+    }
+
+    async function cleanupUploads() {
+      try {
+        const response = await fetch("/api/admin/cleanup-uploads", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ maxAgeHours: Number(cleanupHoursSelect.value) || 24 }),
+        });
+        const data = await safeJson(response);
+        if (!response.ok || data.error) throw new Error(readErrorMessage(data, "清理上传文件失败"));
+        renderAdminStatus({ uploads: data.uploads, cleanup: data });
+        setMessage(`已清理 ${data.deletedCount || 0} 个上传文件。`, "success");
+      } catch (error) {
+        setMessage(error.message || "清理上传文件失败。", "error");
+      }
+    }
+
+    function exportData() {
+      const data = collectExportData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `xiaolin-wuyou-${getCurrentUser()}-${Date.now()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function collectExportData() {
+      return {
+        exportedAt: new Date().toISOString(),
+        user: getCurrentUser(),
+        references: referenceImages,
+        queue,
+        history,
+        savedPrompts,
+        imageLibrary,
+        usageStats,
+        projects,
+        promptVersions,
+        debugLogs,
+        settings: readJson(STORAGE_KEYS.settings, {}),
+      };
+    }
+
+    async function importDataFromFile(event) {
+      const file = event.target.files?.[0];
+      event.target.value = "";
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        applyImportedData(data);
+        renderAll();
+        setMessage("数据已导入。", "success");
+      } catch (error) {
+        setMessage(error.message || "导入失败。", "error");
+      }
+    }
+
+    function applyImportedData(data) {
+      referenceImages = Array.isArray(data.references) ? data.references.slice(0, MAX_REFERENCES) : referenceImages;
+      queue = Array.isArray(data.queue) ? data.queue.map(normalizeSavedTask) : queue;
+      history = Array.isArray(data.history) ? data.history : history;
+      savedPrompts = Array.isArray(data.savedPrompts) ? data.savedPrompts : savedPrompts;
+      imageLibrary = Array.isArray(data.imageLibrary) ? data.imageLibrary : imageLibrary;
+      usageStats = data.usageStats && typeof data.usageStats === "object" ? data.usageStats : usageStats;
+      projects = Array.isArray(data.projects) ? data.projects : projects;
+      promptVersions = Array.isArray(data.promptVersions) ? data.promptVersions : promptVersions;
+      debugLogs = Array.isArray(data.debugLogs) ? data.debugLogs : debugLogs;
+      if (data.settings) writeStorage(STORAGE_KEYS.settings, JSON.stringify(data.settings));
+      persistReferences();
+      persistQueue();
+      persistHistory();
+      persistSavedPrompts();
+      persistLibrary();
+      persistStats();
+      writeStorage(STORAGE_KEYS.projects, JSON.stringify(projects));
+      persistPromptVersions();
+      persistDebugLogs();
+      loadLocalState();
+    }
+
+    function downloadUrls(urls) {
+      if (!urls.length) {
+        setMessage("没有可下载的结果图。", "error");
+        return;
+      }
+      urls.forEach((url, index) => {
+        setTimeout(() => {
+          const link = document.createElement("a");
+          link.href = `/api/download-image?url=${encodeURIComponent(url)}&name=${encodeURIComponent(buildFileBaseName("batch", index))}`;
+          link.download = `${buildFileBaseName("batch", index)}.png`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        }, index * 300);
+      });
+      setMessage(`开始下载 ${urls.length} 张图片。`, "success");
+    }
+
+    async function downloadZip(urls, scope) {
+      if (!urls.length) {
+        setMessage("没有可打包下载的结果图。", "error");
+        return;
+      }
+      try {
+        setMessage(`正在打包 ${urls.length} 张图片。`, "loading");
+        const names = urls.map((url, index) => buildFileBaseName(scope, index));
+        const response = await fetch("/api/download-zip", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ urls, names }),
+        });
+        if (!response.ok) {
+          const data = await safeJson(response);
+          throw new Error(readErrorMessage(data, `打包失败 (${response.status})`));
+        }
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `xiaolin-wuyou-${scope}-${Date.now()}.zip`;
+        document.body.appendChild(link);
+        link.click();
+        const objectUrl = link.href;
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        setMessage("ZIP 已开始下载。", "success");
+      } catch (error) {
+        setMessage(error.message || "ZIP 下载失败。", "error");
+      }
+    }
+
+    function getFilteredHistory() {
+      const keyword = historySearchInput.value.trim().toLowerCase();
+      const filter = historyFilterSelect.value;
+      const now = Date.now();
+      return history.filter((entry) => {
+        const haystack = [
+          entry.prompt || "",
+          entry.project || "",
+          ...(entry.tags || []),
+          ...(entry.references || []).map((item) => `${item.name || ""} ${item.note || ""}`),
+        ].join(" ").toLowerCase();
+        if (keyword && !haystack.includes(keyword)) return false;
+        if (filter === "i2i" && !(entry.references || []).length) return false;
+        if (filter === "t2i" && (entry.references || []).length) return false;
+        if (filter === "today" && !isSameDay(entry.createdAt, now)) return false;
+        if (filter === "week" && now - Number(entry.createdAt || 0) > 7 * 24 * 60 * 60 * 1000) return false;
+        return true;
+      });
+    }
+
+    function reuseHistoryItem(id, enqueueNow) {
+      const item = history.find((entry) => entry.id === id);
+      if (!item) return;
+
+      promptInput.value = item.prompt || "";
+      writeStorage(STORAGE_KEYS.prompt, promptInput.value);
+      referenceImages = (item.references || []).map((reference) => ({
+        id: createId(),
+        name: reference.name || "历史参考图",
+        note: reference.note || "",
+        previewUrl: reference.previewUrl || reference.url,
+        url: reference.url,
+        status: "success",
+        error: "",
+      })).slice(0, MAX_REFERENCES);
+
+      if (item.settings) {
+        sizeSelect.value = item.settings.size || "2K";
+        aspectSelect.value = item.settings.aspectRatio || "match_input_image";
+        customWidth.value = item.settings.customWidth || 2048;
+        customHeight.value = item.settings.customHeight || 2048;
+        negativePromptInput.value = item.settings.negativePrompt || "";
+        watermarkTextInput.value = item.settings.watermarkText || "";
+        fileNamePatternSelect.value = item.settings.fileNamePattern || fileNamePatternSelect.value;
+      }
+
+      persistReferences();
+      saveSettings();
+      renderAll();
+      setMessage("已载入历史提示词和参考图。", "success");
+      if (enqueueNow) enqueueFromCurrentForm(true);
+    }
+
+    function resetCurrentForm() {
+      form.reset();
+      promptInput.value = "";
+      batchPromptsInput.value = "";
+      referenceImages = [];
+      removeStorage(STORAGE_KEYS.prompt);
+      removeStorage(STORAGE_KEYS.batchPrompts);
+      persistReferences();
+      sizeSelect.value = "2K";
+      aspectSelect.value = "match_input_image";
+      taskCountInput.value = "1";
+      concurrencyInput.value = "2";
+      saveSettings();
+      clearResults();
+      renderAll();
+      setMessage("当前表单已清空。", "");
+    }
+
+    function renderAll() {
+      updateModeFromReferences();
+      renderReferences();
+      renderSavedPrompts();
+      renderQueue();
+      renderHistory();
+      renderLibrary();
+      renderAdminSummary();
+      renderDebugLogs();
+      updateApiState();
+    }
+
+    function renderSavedPrompts() {
+      savedPromptsEl.innerHTML = "";
+      savedPrompts.slice(0, 16).forEach((prompt) => {
+        const button = document.createElement("button");
+        button.className = "saved-prompt";
+        button.type = "button";
+        button.textContent = prompt;
+        button.title = prompt;
+        button.addEventListener("click", () => {
+          promptInput.value = prompt;
+          writeStorage(STORAGE_KEYS.prompt, prompt);
+          setMessage("已载入收藏提示词。", "success");
+        });
+        savedPromptsEl.append(button);
+      });
+      promptVersions.slice(0, 8).forEach((version) => {
+        const button = document.createElement("button");
+        button.className = "saved-prompt";
+        button.type = "button";
+        button.textContent = `版本 ${formatTime(version.createdAt)} · ${version.project || "默认项目"}`;
+        button.title = version.prompt;
+        button.addEventListener("click", () => {
+          promptInput.value = version.prompt;
+          writeStorage(STORAGE_KEYS.prompt, version.prompt);
+          setMessage("已载入提示词历史版本。", "success");
+        });
+        savedPromptsEl.append(button);
+      });
+    }
+
+    function renderReferences() {
+      referenceList.innerHTML = "";
+      if (!referenceImages.length) return;
+
+      referenceImages.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "reference-item";
+        row.draggable = true;
+        row.addEventListener("dragstart", (event) => {
+          event.dataTransfer.setData("text/plain", item.id);
+        });
+        row.addEventListener("dragover", (event) => event.preventDefault());
+        row.addEventListener("drop", (event) => {
+          event.preventDefault();
+          reorderReference(event.dataTransfer.getData("text/plain"), item.id);
+        });
+
+        const img = document.createElement("img");
+        img.className = "reference-thumb";
+        img.alt = item.name;
+        img.src = item.previewUrl || item.url || "";
+
+        const meta = document.createElement("div");
+        meta.className = "reference-meta";
+
+        const name = document.createElement("div");
+        name.className = "reference-name";
+        name.textContent = item.name;
+
+        const url = document.createElement("div");
+        url.className = "reference-url";
+        url.textContent = item.status === "error" ? item.error : item.status === "uploading" ? "上传中..." : item.url;
+
+        const status = document.createElement("div");
+        status.className = `status-text ${item.status === "error" ? "error" : item.status === "success" ? "success" : ""}`;
+        status.textContent = item.status === "success" ? "会发送给 VModel" : item.status === "error" ? "不可用" : "上传中";
+
+        meta.append(name, url, status);
+
+        if (item.status === "success") {
+          const noteWrap = document.createElement("div");
+          noteWrap.className = "reference-note";
+          const roleSelect = document.createElement("select");
+          roleSelect.value = item.role || "reference";
+          [
+            ["reference", "参考"],
+            ["face", "脸"],
+            ["pose", "姿势"],
+            ["clothes", "服装"],
+            ["background", "背景"],
+            ["style", "风格"],
+          ].forEach(([value, label]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = label;
+            roleSelect.append(option);
+          });
+          roleSelect.addEventListener("change", () => {
+            item.role = roleSelect.value;
+            persistReferences();
+          });
+          const noteInput = document.createElement("input");
+          noteInput.type = "text";
+          noteInput.placeholder = "备注：脸/服装/姿势/风格";
+          noteInput.value = item.note || "";
+          noteInput.addEventListener("input", () => {
+            item.note = noteInput.value;
+            persistReferences();
+          });
+          noteWrap.append(noteInput, roleSelect);
+          meta.append(noteWrap);
+        }
+
+        const remove = document.createElement("button");
+        remove.className = "remove-reference";
+        remove.type = "button";
+        remove.textContent = "x";
+        remove.title = "移除参考图";
+        remove.addEventListener("click", () => removeReference(item.id));
+
+        row.append(img, meta, remove);
+        referenceList.append(row);
+      });
+    }
+
+    function reorderReference(sourceId, targetId) {
+      if (!sourceId || sourceId === targetId) return;
+      const sourceIndex = referenceImages.findIndex((item) => item.id === sourceId);
+      const targetIndex = referenceImages.findIndex((item) => item.id === targetId);
+      if (sourceIndex < 0 || targetIndex < 0) return;
+      const [source] = referenceImages.splice(sourceIndex, 1);
+      referenceImages.splice(targetIndex, 0, source);
+      persistReferences();
+      renderReferences();
+    }
+
+    function renderQueue() {
+      queueStats.textContent = `${queue.length} 个任务${queuePaused ? " · 已暂停" : ""}`;
+      queueList.innerHTML = "";
+      if (!queue.length) {
+        queueList.innerHTML = '<div class="empty-list">暂无任务。提交后会在这里看到队列进度。</div>';
+        return;
+      }
+
+      queue.slice(0, 30).forEach((task) => {
+        const item = document.createElement("article");
+        item.className = "queue-item";
+
+        const head = document.createElement("div");
+        head.className = "queue-head";
+
+        const meta = document.createElement("div");
+        meta.className = "queue-meta";
+        const title = document.createElement("div");
+        title.className = "queue-title";
+        title.textContent = task.prompt;
+        const subtitle = document.createElement("div");
+        subtitle.className = "queue-subtitle";
+        subtitle.textContent = `${formatTime(task.createdAt)} · 重试 ${task.retryCount || 0}/${MAX_RETRIES} · ${classifyError(task.error || task.message)}`;
+        meta.append(title, subtitle);
+
+        const status = document.createElement("div");
+        status.className = `queue-status ${task.status}`;
+        status.textContent = statusText(task.status);
+        head.append(meta, status);
+        item.append(head);
+
+        const images = document.createElement("div");
+        images.className = "queue-images";
+        [...(task.references || []), ...(task.resultUrls || []).map((url) => ({ url, previewUrl: url, name: "结果" }))].slice(0, 8).forEach((image) => {
+          const img = document.createElement("img");
+          img.className = "queue-thumb";
+          img.alt = image.name || "图片";
+          img.src = image.previewUrl || image.url;
+          images.append(img);
+        });
+        if (images.children.length) item.append(images);
+
+        const actions = document.createElement("div");
+        actions.className = "queue-actions";
+        if (task.status === "queued") {
+          actions.append(makeSmallButton("暂停任务", () => {
+            task.status = "paused";
+            task.message = "已暂停";
+            persistQueue();
+            renderAll();
+          }));
+        }
+        if (task.status === "paused") {
+          actions.append(makeSmallButton("继续任务", () => {
+            task.status = "queued";
+            task.message = "等待生成";
+            persistQueue();
+            renderAll();
+            startQueue();
+          }));
+        }
+        if (["queued", "paused", "running", "failed"].includes(task.status)) {
+          actions.append(makeSmallButton("取消", () => cancelTask(task.id)));
+        }
+        if (task.status === "failed") {
+          actions.append(makeSmallButton("重新生成", () => {
+            task.status = "queued";
+            task.cancelled = false;
+            task.retryCount = 0;
+            task.error = "";
+            task.message = "手动重新排队";
+            persistQueue();
+            renderAll();
+            startQueue();
+          }));
+        }
+        if (task.resultUrls?.length) {
+          actions.append(makeSmallButton("显示结果", () => renderResults(task.resultUrls, task.prompt)));
+        }
+        if (actions.children.length) item.append(actions);
+
+        queueList.append(item);
+      });
+    }
+
+    function renderHistory() {
+      const filteredHistory = getFilteredHistory();
+      historyStats.textContent = `${filteredHistory.length}/${history.length} 条`;
+      historyList.innerHTML = "";
+      if (!filteredHistory.length) {
+        historyList.innerHTML = '<div class="empty-list">暂无历史。生成成功后会自动保存提示词、参考图和结果。</div>';
+        return;
+      }
+
+      filteredHistory.slice(0, 30).forEach((entry) => {
+        const item = document.createElement("article");
+        item.className = "history-item";
+
+        const head = document.createElement("div");
+        head.className = "history-head";
+
+        const meta = document.createElement("div");
+        meta.className = "history-meta";
+        const title = document.createElement("div");
+        title.className = "history-title";
+        title.textContent = entry.prompt;
+        const subtitle = document.createElement("div");
+        subtitle.className = "history-subtitle";
+        const notes = (entry.references || []).map((item) => item.note).filter(Boolean).join("、");
+        subtitle.textContent = `${formatTime(entry.createdAt)} · ${entry.project || "默认项目"} · ${(entry.tags || []).join("、") || "无标签"} · ${entry.references?.length || 0} 张参考图 · ${entry.resultUrls?.length || 0} 张结果 · 评分 ${entry.rating || 0}${entry.favorite ? " · 已收藏" : ""}${notes ? ` · ${notes}` : ""}`;
+        meta.append(title, subtitle);
+        head.append(meta);
+        item.append(head);
+
+        const images = document.createElement("div");
+        images.className = "history-images";
+        [...(entry.references || []), ...(entry.resultUrls || []).map((url) => ({ url, previewUrl: url, name: "结果" }))].slice(0, 10).forEach((image) => {
+          const img = document.createElement("img");
+          img.className = "history-thumb";
+          img.alt = image.name || "图片";
+          img.src = image.previewUrl || image.url;
+          images.append(img);
+        });
+        if (images.children.length) item.append(images);
+
+        const actions = document.createElement("div");
+        actions.className = "history-actions";
+        actions.append(makeSmallButton("重新生图", () => reuseHistoryItem(entry.id, true)));
+        actions.append(makeSmallButton("载入编辑", () => reuseHistoryItem(entry.id, false)));
+        actions.append(makeSmallButton("加星", () => rateHistory(entry.id, Math.min(5, (entry.rating || 0) + 1))));
+        actions.append(makeSmallButton(entry.favorite ? "取消收藏" : "收藏", () => toggleHistoryFavorite(entry.id)));
+        if (entry.resultUrls?.length) {
+          actions.append(makeSmallButton("显示结果", () => renderResults(entry.resultUrls, entry.prompt)));
+          actions.append(makeSmallButton("结果继续生图", () => useResultAsReference(entry)));
+        }
+        item.append(actions);
+        historyList.append(item);
+      });
+    }
+
+    function renderLibrary() {
+      const keyword = libraryFilterInput.value.trim().toLowerCase();
+      const filteredLibrary = imageLibrary.filter((image) => {
+        const haystack = [
+          image.name || "",
+          image.note || "",
+          image.project || "",
+          ...(image.tags || []),
+          image.source || "",
+        ].join(" ").toLowerCase();
+        return !keyword || haystack.includes(keyword);
+      });
+      libraryStats.textContent = `${filteredLibrary.length}/${imageLibrary.length} 张`;
+      libraryList.innerHTML = "";
+      if (!filteredLibrary.length) {
+        libraryList.innerHTML = '<div class="empty-list">暂无素材。上传参考图或生成结果后会自动保存到这里。</div>';
+        return;
+      }
+      filteredLibrary.slice(0, 40).forEach((image) => {
+        const item = document.createElement("article");
+        item.className = "library-item";
+        const title = document.createElement("div");
+        title.className = "history-title";
+        title.textContent = `${image.source === "result" ? "结果" : "参考"} · ${image.name || "图片"}`;
+        const subtitle = document.createElement("div");
+        subtitle.className = "history-subtitle";
+        subtitle.textContent = `${formatTime(image.createdAt)} · ${image.project || "默认项目"} · ${(image.tags || []).join("、") || "无标签"}${image.note ? ` · ${image.note}` : ""}`;
+        const images = document.createElement("div");
+        images.className = "history-images";
+        const img = document.createElement("img");
+        img.className = "history-thumb";
+        img.src = image.previewUrl || image.url;
+        img.alt = image.name || "素材";
+        images.append(img);
+        const actions = document.createElement("div");
+        actions.className = "history-actions";
+        actions.append(makeSmallButton("设为参考图", () => addLibraryAsReference(image)));
+        actions.append(makeSmallButton("复制链接", () => copyText(image.url)));
+        actions.append(makeSmallButton("打开", () => window.open(image.url, "_blank", "noopener")));
+        item.append(title, subtitle, images, actions);
+        libraryList.append(item);
+      });
+    }
+
+    function renderAdminSummary() {
+      const today = new Date().toISOString().slice(0, 10);
+      const todayStats = usageStats[today] || { submitted: 0, success: 0, failed: 0 };
+      const quota = clampNumber(dailyQuotaInput.value, 0, 99999, 0);
+      const unitCost = Math.max(0, Number(unitCostInput.value) || 0);
+      const submitted = Number(todayStats.submitted || 0);
+      const cost = submitted * unitCost;
+      const quotaText = quota ? ` / 剩余 ${Math.max(0, quota - submitted)}` : "";
+      const costText = unitCost ? ` / 约 ${formatMoney(cost)}` : "";
+      statsText.textContent = `今日 ${submitted} 提交 / ${todayStats.success || 0} 成功 / ${todayStats.failed || 0} 失败${quotaText}${costText}`;
+      if (!adminList.innerHTML.trim()) {
+        adminList.innerHTML = `
+          <div class="admin-item">当前用户：${escapeHtml(getCurrentUser())}</div>
+          <div class="admin-item">每日配额：${quota ? `${submitted}/${quota}` : "不限"}</div>
+          <div class="admin-item">预估成本：${unitCost ? formatMoney(cost) : "未设置单图成本"}</div>
+        `;
+      }
+    }
+
+    function renderAdminStatus(data) {
+      const uploadText = data.uploads
+        ? `上传文件：${data.uploads.count || 0} 个，${data.uploads.mb || 0} MB`
+        : "上传文件：未知";
+      const cleanupText = data.cleanup ? `本次清理：${data.cleanup.deletedCount || 0} 个文件` : "";
+      const today = new Date().toISOString().slice(0, 10);
+      const todayStats = usageStats[today] || { submitted: 0, success: 0, failed: 0 };
+      const quota = clampNumber(dailyQuotaInput.value, 0, 99999, 0);
+      const unitCost = Math.max(0, Number(unitCostInput.value) || 0);
+      const submitted = Number(todayStats.submitted || 0);
+      adminList.innerHTML = `
+        <div class="admin-item">当前用户：${escapeHtml(getCurrentUser())}</div>
+        <div class="admin-item">模型：${escapeHtml(data.model || "Seedream 4.5")}</div>
+        <div class="admin-item">API Key：${data.hasApiKey ? "已配置" : "未配置"}</div>
+        <div class="admin-item">访问密码：${data.authRequired ? "已启用" : "未启用"}</div>
+        <div class="admin-item">SQLite：${data.database?.enabled ? `已启用，${data.database.states || 0} 个用户状态` : "未启用"}</div>
+        <div class="admin-item">${escapeHtml(uploadText)}</div>
+        <div class="admin-item">每日配额：${quota ? `${submitted}/${quota}，剩余 ${Math.max(0, quota - submitted)}` : "不限"}</div>
+        <div class="admin-item">预估成本：${unitCost ? formatMoney(submitted * unitCost) : "未设置单图成本"}</div>
+        ${cleanupText ? `<div class="admin-item">${escapeHtml(cleanupText)}</div>` : ""}
+      `;
+    }
+
+    function renderResults(urls, prompt) {
+      placeholder.style.display = "none";
+      resultGrid.style.display = "grid";
+      resultGrid.innerHTML = "";
+
+      urls.forEach((url, index) => {
+        const card = document.createElement("article");
+        card.className = "result-card";
+
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = `${prompt} - 结果 ${index + 1}`;
+
+        const actions = document.createElement("div");
+        actions.className = "result-actions";
+
+        const open = document.createElement("a");
+        open.className = "small-btn";
+        open.href = url;
+        open.target = "_blank";
+        open.rel = "noopener noreferrer";
+        open.textContent = "打开原图";
+
+        const download = document.createElement("a");
+        download.className = "small-btn";
+        download.href = buildDownloadHref(url, prompt, index);
+        download.download = `xiaolin-wuyou-${Date.now()}-${index + 1}.png`;
+        download.textContent = "直接下载";
+
+        const watermark = document.createElement("button");
+        watermark.className = "small-btn";
+        watermark.type = "button";
+        watermark.textContent = "水印下载";
+        watermark.addEventListener("click", () => downloadWithWatermark(url, prompt, index));
+
+        const continueBtn = document.createElement("button");
+        continueBtn.className = "small-btn";
+        continueBtn.type = "button";
+        continueBtn.textContent = "继续生图";
+        continueBtn.addEventListener("click", () => addResultAsReference(url, prompt));
+
+        const compareBtn = document.createElement("button");
+        compareBtn.className = "small-btn";
+        compareBtn.type = "button";
+        compareBtn.textContent = "对比参考";
+        compareBtn.addEventListener("click", () => renderCompare(url, prompt));
+
+        const copy = document.createElement("button");
+        copy.className = "small-btn";
+        copy.type = "button";
+        copy.textContent = "复制链接";
+        copy.addEventListener("click", () => copyText(url));
+
+        actions.append(open, download, watermark, continueBtn, compareBtn, copy);
+        card.append(img, actions);
+        resultGrid.append(card);
+      });
+    }
+
+    function clearResults() {
+      placeholder.style.display = "grid";
+      resultGrid.style.display = "none";
+      resultGrid.innerHTML = "";
+      taskIdText.textContent = "尚未提交任务";
+    }
+
+    function makeSmallButton(text, onClick) {
+      const button = document.createElement("button");
+      button.className = "small-btn";
+      button.type = "button";
+      button.textContent = text;
+      button.addEventListener("click", onClick);
+      return button;
+    }
+
+    function enhancePrompt() {
+      const prompt = promptInput.value.trim();
+      if (!prompt) {
+        setMessage("请先输入提示词。", "error");
+        return;
+      }
+      const additions = "高质量细节，主体清晰，构图稳定，真实光影，材质细腻，背景干净，专业摄影，色彩协调";
+      if (!prompt.includes("高质量细节")) {
+        promptInput.value = `${prompt}，${additions}`;
+        writeStorage(STORAGE_KEYS.prompt, promptInput.value);
+      }
+      setMessage("已增强提示词。", "success");
+    }
+
+    function rememberPromptVersion() {
+      const prompt = promptInput.value.trim();
+      if (!prompt) return;
+      const last = promptVersions[0]?.prompt;
+      if (last === prompt) return;
+      promptVersions.unshift({
+        id: createId(),
+        createdAt: Date.now(),
+        project: currentProject(),
+        tags: currentTags(),
+        prompt,
+      });
+      promptVersions = promptVersions.slice(0, 100);
+      persistPromptVersions();
+    }
+
+    function showCurrentPayloadDebug() {
+      const prompt = promptInput.value.trim() || batchPromptsInput.value.split(/\r?\n/).find(Boolean) || "";
+      if (!prompt) {
+        setMessage("请先填写提示词。", "error");
+        return;
+      }
+      const input = buildInputPayload(prompt);
+      addDebugLog("当前提交参数预览", JSON.stringify({
+        user: getCurrentUser(),
+        project: currentProject(),
+        tags: currentTags(),
+        input,
+      }, null, 2));
+      setMessage("提交参数已显示在调试面板。", "success");
+    }
+
+    function addDebugLog(title, detail) {
+      debugLogs.unshift({
+        id: createId(),
+        createdAt: Date.now(),
+        title,
+        detail: String(detail || ""),
+      });
+      debugLogs = debugLogs.slice(0, 80);
+      persistDebugLogs();
+      renderDebugLogs();
+    }
+
+    function renderDebugLogs() {
+      debugStats.textContent = `${debugLogs.length} 条`;
+      debugBox.textContent = debugLogs.length
+        ? debugLogs.slice(0, 20).map((item) => `[${formatTime(item.createdAt)}] ${item.title}\n${item.detail}`).join("\n\n")
+        : "暂无调试信息。";
+    }
+
+    function clearDebugLogs() {
+      debugLogs = [];
+      persistDebugLogs();
+      renderDebugLogs();
+      setMessage("调试信息已清空。", "success");
+    }
+
+    function registerPwa() {
+      if (!("serviceWorker" in navigator)) return;
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+
+    function rerunFilteredHistory() {
+      const items = getFilteredHistory();
+      if (!items.length) {
+        setMessage("当前筛选没有可重跑的历史。", "error");
+        return;
+      }
+      const selectedItems = items.slice(0, 30);
+      const quotaError = checkDailyQuota(selectedItems.length);
+      if (quotaError) {
+        setMessage(quotaError, "error");
+        return;
+      }
+      selectedItems.forEach((entry) => {
+        const input = buildInputForReferences(entry.prompt, (entry.references || []).map((item) => item.url).filter(Boolean));
+        queue.unshift({
+          id: createId(),
+          createdAt: Date.now(),
+          status: "queued",
+          retryCount: 0,
+          taskId: "",
+          message: "历史筛选重跑",
+          resultUrls: [],
+          error: "",
+          cancelled: false,
+          prompt: entry.prompt,
+          input,
+          references: entry.references || [],
+          settings: {
+            ...(entry.settings || {}),
+            size: sizeSelect.value,
+            aspectRatio: aspectSelect.value,
+            negativePrompt: negativePromptInput.value.trim(),
+          },
+        });
+      });
+      incrementStats("submitted", selectedItems.length);
+      persistQueue();
+      renderAll();
+      setMessage(`已加入 ${selectedItems.length} 个历史重跑任务。`, "success");
+      startQueue();
+    }
+
+    function buildInputForReferences(prompt, referenceUrls) {
+      const finalPrompt = withNegativePrompt(prompt);
+      if (referenceUrls.length) {
+        return {
+          prompt: finalPrompt,
+          size: ["1K", "2K", "4K"].includes(sizeSelect.value) ? sizeSelect.value : "2K",
+          aspect_ratio: aspectSelect.value,
+          image_input: referenceUrls.slice(0, MAX_REFERENCES),
+        };
+      }
+      if (sizeSelect.value === "custom") {
+        return {
+          prompt: finalPrompt,
+          size: "custom",
+          width: Number(customWidth.value),
+          height: Number(customHeight.value),
+        };
+      }
+      return {
+        prompt: finalPrompt,
+        size: sizeSelect.value,
+        aspect_ratio: aspectSelect.value === "match_input_image" ? "1:1" : aspectSelect.value,
+      };
+    }
+
+    function useResultAsReference(entry) {
+      const first = entry.resultUrls?.[0];
+      if (!first) return;
+      addResultAsReference(first, entry.prompt);
+    }
+
+    function addResultAsReference(url, prompt) {
+      if (referenceImages.length >= MAX_REFERENCES) {
+        setMessage("参考图已满，请先删除一张。", "error");
+        return;
+      }
+      referenceImages.push({
+        id: createId(),
+        name: "结果续生图",
+        note: "结果继续生图",
+        previewUrl: url,
+        url,
+        status: "success",
+        error: "",
+      });
+      promptInput.value = prompt || promptInput.value;
+      writeStorage(STORAGE_KEYS.prompt, promptInput.value);
+      persistReferences();
+      renderAll();
+      setMessage("结果图已作为参考图加入。", "success");
+    }
+
+    function addLibraryAsReference(image) {
+      if (referenceImages.length >= MAX_REFERENCES) {
+        setMessage("参考图已满，请先删除一张。", "error");
+        return;
+      }
+      referenceImages.push({
+        id: createId(),
+        name: image.name || "素材图",
+        note: image.note || "",
+        previewUrl: image.previewUrl || image.url,
+        url: image.url,
+        status: "success",
+        error: "",
+      });
+      persistReferences();
+      renderAll();
+      setMessage("素材已加入参考图。", "success");
+    }
+
+    function renderCompare(resultUrl, prompt) {
+      placeholder.style.display = "none";
+      resultGrid.style.display = "grid";
+      const firstReference = referenceImages.find((item) => item.status === "success");
+      const refUrl = firstReference?.previewUrl || firstReference?.url || "";
+      resultGrid.innerHTML = `
+        <div class="result-card">
+          <div class="compare-grid">
+            <div><img src="${escapeHtml(refUrl || resultUrl)}" alt="参考图"></div>
+            <div><img src="${escapeHtml(resultUrl)}" alt="${escapeHtml(prompt)}"></div>
+          </div>
+          <div class="result-actions">
+            <span class="small-btn">左：参考图</span>
+            <span class="small-btn">右：结果图</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildDownloadHref(url, prompt, index) {
+      return `/api/download-image?url=${encodeURIComponent(url)}&name=${encodeURIComponent(buildFileBaseName(prompt, index))}`;
+    }
+
+    function buildFileBaseName(prompt, index) {
+      const cleanPrompt = String(prompt || "image").replace(/[\\/:*?"<>|]+/g, "-").slice(0, 28) || "image";
+      const date = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+      const task = taskIdText.textContent.replace(/[\\/:*?"<>|\\s]+/g, "-").slice(0, 32) || "task";
+      if (fileNamePatternSelect.value === "prompt-date") return `${cleanPrompt}-${date}-${index + 1}`;
+      if (fileNamePatternSelect.value === "task-index") return `${task}-${index + 1}`;
+      return `${date}-${cleanPrompt}-${index + 1}`;
+    }
+
+    async function downloadWithWatermark(url, prompt, index) {
+      const text = watermarkTextInput.value.trim();
+      if (!text) {
+        window.location.href = buildDownloadHref(url, prompt, index);
+        return;
+      }
+      try {
+        const img = await loadImageFromUrl(url);
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const context = canvas.getContext("2d");
+        context.drawImage(img, 0, 0);
+        const fontSize = Math.max(22, Math.round(canvas.width / 28));
+        context.font = `600 ${fontSize}px sans-serif`;
+        context.fillStyle = "rgba(255,255,255,0.72)";
+        context.strokeStyle = "rgba(0,0,0,0.35)";
+        context.lineWidth = Math.max(2, Math.round(fontSize / 10));
+        const x = Math.round(canvas.width * 0.04);
+        const y = Math.round(canvas.height * 0.94);
+        context.strokeText(text, x, y);
+        context.fillText(text, x, y);
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = `${buildFileBaseName(prompt, index)}-watermark.png`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } catch {
+        window.location.href = buildDownloadHref(url, prompt, index);
+      }
+    }
+
+    function loadImageFromUrl(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    function notifyTaskDone(task) {
+      if (!notifyDoneInput.checked) return;
+      try {
+        if ("Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission();
+        }
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("小林无忧生图", { body: task.message || "任务已完成" });
+        }
+        const audio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=");
+        audio.play().catch(() => {});
+      } catch {
+        // notification is best-effort
+      }
+    }
+
+    function statusText(status) {
+      return {
+        queued: "排队中",
+        paused: "已暂停",
+        running: "生成中",
+        done: "已完成",
+        failed: "失败",
+      }[status] || status;
+    }
+
+    function hasUsableApiKey() {
+      return Boolean(readApiKey() || hasEnvApiKey);
+    }
+
+    function readApiKey() {
+      return (readStorage(STORAGE_KEYS.apiKey) || "").trim();
+    }
+
+    function readTaskId(data) {
+      return data?.result?.task_id || data?.task_id || data?.id || data?.data?.task_id || "";
+    }
+
+    function readTaskStatus(data) {
+      return String(
+        data?.result?.status ||
+        data?.status ||
+        data?.data?.status ||
+        data?.result?.task_status ||
+        ""
+      ).toLowerCase();
+    }
+
+    function isDoneStatus(status) {
+      return ["completed", "succeeded", "success", "done", "finished"].includes(status);
+    }
+
+    function isFailedStatus(status) {
+      return ["failed", "error", "cancelled", "canceled"].includes(status);
+    }
+
+    function extractImageUrls(value) {
+      const urls = [];
+      walk(value);
+      return [...new Set(urls)];
+
+      function walk(item) {
+        if (!item) return;
+        if (typeof item === "string") {
+          if (/^https?:\/\/.+/i.test(item) || /^data:image\//i.test(item)) urls.push(item);
+          return;
+        }
+        if (Array.isArray(item)) {
+          item.forEach(walk);
+          return;
+        }
+        if (typeof item === "object") {
+          const preferred = ["url", "image_url", "image", "images", "output", "result", "data"];
+          preferred.forEach((key) => {
+            if (key in item) walk(item[key]);
+          });
+          Object.keys(item).forEach((key) => {
+            if (!preferred.includes(key)) walk(item[key]);
+          });
+        }
+      }
+    }
+
+    function isApiError(data) {
+      if (!data) return false;
+      if (data.error) return true;
+      if (typeof data.code === "number" && ![0, 200].includes(data.code)) return true;
+      if (typeof data.status_code === "number" && data.status_code >= 400) return true;
+      return false;
+    }
+
+    function readErrorMessage(data, fallback) {
+      if (!data) return fallback;
+      if (typeof data === "string") return data;
+      if (typeof data.error === "string") return data.error;
+      if (typeof data.message === "string") return data.message;
+      if (typeof data.message?.zh === "string") return data.message.zh;
+      if (typeof data.message?.en === "string") return data.message.en;
+      if (typeof data.detail === "string") return data.detail;
+      if (typeof data.raw?.message === "string") return data.raw.message;
+      if (typeof data.raw?.message?.zh === "string") return data.raw.message.zh;
+      if (typeof data.raw?.message?.en === "string") return data.raw.message.en;
+      if (typeof data.raw?.error === "string") return data.raw.error;
+      if (typeof data.raw?.detail === "string") return data.raw.detail;
+      return fallback;
+    }
+
+    async function safeJson(response) {
+      const text = await response.text();
+      if (!text) return {};
+      try {
+        return JSON.parse(text);
+      } catch {
+        return { error: text };
+      }
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("读取图片失败，请换一张图片重试。"));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function prepareImageDataUrl(file) {
+      const quality = Number(compressQualitySelect.value);
+      const maxSide = Number(maxImageSideSelect.value);
+
+      try {
+        const bitmap = await loadImageBitmap(file);
+        const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+        const width = Math.max(1, Math.round(bitmap.width * scale));
+        const height = Math.max(1, Math.round(bitmap.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        context.drawImage(bitmap, 0, 0, width, height);
+        if (cropBeforeUploadInput.checked) {
+          loadEditorCanvas(canvas);
+          setMessage("已载入编辑预览，调整后点击“应用编辑”继续上传。", "success");
+          return await waitForImageEdit();
+        }
+        lastPreparedDataUrl = canvas.toDataURL("image/jpeg", Number.isFinite(quality) && quality < 1 ? quality : 0.92);
+        return lastPreparedDataUrl;
+      } catch {
+        const dataUrl = await readFileAsDataUrl(file);
+        lastPreparedDataUrl = dataUrl;
+        return dataUrl;
+      }
+    }
+
+    function loadEditorCanvas(sourceCanvas) {
+      canvasEditor.style.display = "grid";
+      editCanvas.width = sourceCanvas.width;
+      editCanvas.height = sourceCanvas.height;
+      editCanvas.getContext("2d").drawImage(sourceCanvas, 0, 0);
+    }
+
+    function rotatePreparedImage() {
+      if (!editCanvas.width) {
+        setMessage("请先上传一张图片。", "error");
+        return;
+      }
+      const temp = document.createElement("canvas");
+      temp.width = editCanvas.height;
+      temp.height = editCanvas.width;
+      const context = temp.getContext("2d");
+      context.translate(temp.width / 2, temp.height / 2);
+      context.rotate(Math.PI / 2);
+      context.drawImage(editCanvas, -editCanvas.width / 2, -editCanvas.height / 2);
+      loadEditorCanvas(temp);
+      lastPreparedDataUrl = editCanvas.toDataURL("image/jpeg", Number(compressQualitySelect.value) || 0.86);
+      setMessage("图片已旋转。", "success");
+    }
+
+    function cropPreparedImageSquare() {
+      if (!editCanvas.width) {
+        setMessage("请先上传一张图片。", "error");
+        return;
+      }
+      const side = Math.min(editCanvas.width, editCanvas.height);
+      const x = Math.round((editCanvas.width - side) / 2);
+      const y = Math.round((editCanvas.height - side) / 2);
+      const temp = document.createElement("canvas");
+      temp.width = side;
+      temp.height = side;
+      temp.getContext("2d").drawImage(editCanvas, x, y, side, side, 0, 0, side, side);
+      loadEditorCanvas(temp);
+      lastPreparedDataUrl = editCanvas.toDataURL("image/jpeg", Number(compressQualitySelect.value) || 0.86);
+      setMessage("图片已方形裁剪。", "success");
+    }
+
+    function getEditedDataUrl() {
+      if (!cropBeforeUploadInput.checked || !editCanvas.width) return "";
+      return editCanvas.toDataURL("image/jpeg", Number(compressQualitySelect.value) || 0.86);
+    }
+
+    function waitForImageEdit() {
+      return new Promise((resolve) => {
+        pendingEditResolve = resolve;
+      });
+    }
+
+    function applyPreparedImageEdit() {
+      if (!pendingEditResolve) {
+        setMessage("没有等待应用的编辑图片。", "error");
+        return;
+      }
+      lastPreparedDataUrl = getEditedDataUrl();
+      const resolve = pendingEditResolve;
+      pendingEditResolve = null;
+      canvasEditor.style.display = "none";
+      resolve(lastPreparedDataUrl);
+      setMessage("已应用编辑，继续上传参考图。", "loading");
+    }
+
+    function loadImageBitmap(file) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("图片压缩失败"));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    function classifyError(text) {
+      const value = String(text || "");
+      if (!value) return "";
+      if (/api key|unauthorized|401|403|鉴权|授权|key/i.test(value)) return `API Key 错误：${value}`;
+      if (/余额|额度|quota|credit|billing|recharge/i.test(value)) return `余额/额度错误：${value}`;
+      if (/图床|upload|fetch failed|公网|URL|图片.*失败/i.test(value)) return `图片/图床错误：${value}`;
+      if (/timeout|超时|network|ECONN|ENOTFOUND/i.test(value)) return `网络错误：${value}`;
+      if (/VModel|创建任务|查询任务|任务生成/i.test(value)) return `VModel 错误：${value}`;
+      return value;
+    }
+
+    function setMessage(text, type) {
+      message.className = type ? `message ${type}` : "message";
+      message.innerHTML = type === "loading" ? `<span class="spinner"></span>${escapeHtml(text)}` : escapeHtml(text);
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+      setMessage("图片链接已复制。", "success");
+    }
+
+    function readJson(key, fallback) {
+      try {
+        return JSON.parse(readStorage(key) || "");
+      } catch {
+        return fallback;
+      }
+    }
+
+    function getCurrentUser() {
+      return (localStorage.getItem(STORAGE_KEYS.userProfile) || "default").trim() || "default";
+    }
+
+    function userKey(key) {
+      if (key === STORAGE_KEYS.userProfile) return key;
+      return `${getCurrentUser()}::${key}`;
+    }
+
+    function readStorage(key) {
+      return localStorage.getItem(userKey(key));
+    }
+
+    function writeStorage(key, value) {
+      localStorage.setItem(userKey(key), value);
+    }
+
+    function removeStorage(key) {
+      localStorage.removeItem(userKey(key));
+    }
+
+    function switchUserProfile() {
+      const user = (userProfileInput.value || "default").trim() || "default";
+      localStorage.setItem(STORAGE_KEYS.userProfile, user);
+      referenceImages = [];
+      queue = [];
+      history = [];
+      savedPrompts = [];
+      imageLibrary = [];
+      usageStats = {};
+      loadLocalState();
+      renderAll();
+      setMessage(`已切换到用户：${user}`, "success");
+    }
+
+    function clampNumber(value, min, max, fallback) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return fallback;
+      return Math.max(min, Math.min(max, Math.round(number)));
+    }
+
+    function formatMoney(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return "0.00";
+      return number.toFixed(2);
+    }
+
+    function createId() {
+      return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+
+    function formatTime(value) {
+      return new Date(value || Date.now()).toLocaleString("zh-CN", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    function isSameDay(a, b) {
+      const left = new Date(a || 0);
+      const right = new Date(b || 0);
+      return left.getFullYear() === right.getFullYear() &&
+        left.getMonth() === right.getMonth() &&
+        left.getDate() === right.getDate();
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
