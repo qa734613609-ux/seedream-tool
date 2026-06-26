@@ -1085,17 +1085,6 @@
             <div class="hint" id="apiKeyHint">访问者需要填写自己的 VModel API Key。</div>
           </div>
 
-          <div class="grid-2">
-            <div class="field">
-              <label for="projectName">项目/文件夹 <span>用于分组管理</span></label>
-              <input type="text" id="projectName" placeholder="默认项目" />
-            </div>
-            <div class="field">
-              <label for="tagInput">标签 <span>逗号分隔</span></label>
-              <input type="text" id="tagInput" placeholder="头像, 产品图, 写实" />
-            </div>
-          </div>
-
           <div class="field">
             <label for="referenceUrl">参考图片 URL <span>可手动添加，最多 5 张</span></label>
             <div class="reference-tools">
@@ -1262,17 +1251,6 @@
             </div>
           </div>
 
-          <div class="grid-2">
-            <div class="field">
-              <label for="dailyQuota">每日配额 <span>0 表示不限</span></label>
-              <input type="number" id="dailyQuota" value="0" min="0" max="99999" step="1" />
-            </div>
-            <div class="field">
-              <label for="unitCost">单图成本 <span>用于估算</span></label>
-              <input type="number" id="unitCost" value="0" min="0" max="99999" step="0.01" />
-            </div>
-          </div>
-
           <div class="field">
             <label class="inline-check">
               <input type="checkbox" id="notifyDone" />
@@ -1348,7 +1326,7 @@
         <section class="panel panel-pad">
           <h2 class="section-title">素材库 <span id="libraryStats">0 张</span></h2>
           <div class="field">
-            <label for="libraryFilter">筛选素材 <span>项目/标签/备注</span></label>
+            <label for="libraryFilter">筛选素材 <span>名称/备注</span></label>
             <input type="text" id="libraryFilter" placeholder="输入关键词" />
           </div>
           <div class="actions">
@@ -1415,7 +1393,6 @@
       authUser: "xiaolin_wuyou_auth_user_v1",
       library: "xiaolin_wuyou_library_v1",
       stats: "xiaolin_wuyou_stats_v1",
-      projects: "xiaolin_wuyou_projects_v1",
       promptVersions: "xiaolin_wuyou_prompt_versions_v1",
       debugLogs: "xiaolin_wuyou_debug_logs_v1",
     };
@@ -1438,8 +1415,6 @@
     const apiKeyInput = document.getElementById("apiKeyInput");
     const saveApiKeyBtn = document.getElementById("saveApiKeyBtn");
     const apiKeyHint = document.getElementById("apiKeyHint");
-    const projectNameInput = document.getElementById("projectName");
-    const tagInput = document.getElementById("tagInput");
     const imageInput = document.getElementById("imageInput");
     const uploadZone = document.getElementById("uploadZone");
     const referenceUrlInput = document.getElementById("referenceUrl");
@@ -1467,8 +1442,6 @@
     const maxImageSideSelect = document.getElementById("maxImageSide");
     const watermarkTextInput = document.getElementById("watermarkText");
     const fileNamePatternSelect = document.getElementById("fileNamePattern");
-    const dailyQuotaInput = document.getElementById("dailyQuota");
-    const unitCostInput = document.getElementById("unitCost");
     const cropBeforeUploadInput = document.getElementById("cropBeforeUpload");
     const canvasEditor = document.getElementById("canvasEditor");
     const editCanvas = document.getElementById("editCanvas");
@@ -1529,7 +1502,6 @@
     let savedPrompts = [];
     let imageLibrary = [];
     let usageStats = {};
-    let projects = [];
     let promptVersions = [];
     let debugLogs = [];
     let currentUser = "";
@@ -1574,7 +1546,7 @@
       clearSavedPromptsBtn.addEventListener("click", clearSavedPrompts);
       presetSelect.addEventListener("change", applyPreset);
 
-      [sizeSelect, aspectSelect, customWidth, customHeight, taskCountInput, concurrencyInput, compressQualitySelect, maxImageSideSelect, watermarkTextInput, fileNamePatternSelect, dailyQuotaInput, unitCostInput, cleanupHoursSelect, cropBeforeUploadInput, notifyDoneInput, negativePromptInput, projectNameInput, tagInput].forEach((element) => {
+      [sizeSelect, aspectSelect, customWidth, customHeight, taskCountInput, concurrencyInput, compressQualitySelect, maxImageSideSelect, watermarkTextInput, fileNamePatternSelect, cleanupHoursSelect, cropBeforeUploadInput, notifyDoneInput, negativePromptInput].forEach((element) => {
         element.addEventListener("change", saveSettings);
         element.addEventListener("input", saveSettings);
       });
@@ -1850,13 +1822,10 @@
       savedPrompts = readJson(STORAGE_KEYS.savedPrompts, []);
       imageLibrary = readJson(STORAGE_KEYS.library, []);
       usageStats = readJson(STORAGE_KEYS.stats, {});
-      projects = readJson(STORAGE_KEYS.projects, []);
       promptVersions = readJson(STORAGE_KEYS.promptVersions, []);
       debugLogs = readJson(STORAGE_KEYS.debugLogs, []);
 
       const settings = readJson(STORAGE_KEYS.settings, {});
-      projectNameInput.value = settings.projectName || "";
-      tagInput.value = settings.tags || "";
       if (settings.size) sizeSelect.value = settings.size;
       if (settings.aspectRatio) aspectSelect.value = settings.aspectRatio;
       if (settings.customWidth) customWidth.value = settings.customWidth;
@@ -1868,8 +1837,6 @@
       if (settings.negativePrompt) negativePromptInput.value = settings.negativePrompt;
       if (settings.watermarkText) watermarkTextInput.value = settings.watermarkText;
       if (settings.fileNamePattern) fileNamePatternSelect.value = settings.fileNamePattern;
-      if (typeof settings.dailyQuota !== "undefined") dailyQuotaInput.value = settings.dailyQuota;
-      if (typeof settings.unitCost !== "undefined") unitCostInput.value = settings.unitCost;
       if (settings.cleanupHours) cleanupHoursSelect.value = settings.cleanupHours;
       cropBeforeUploadInput.checked = Boolean(settings.cropBeforeUpload);
       notifyDoneInput.checked = Boolean(settings.notifyDone);
@@ -1883,7 +1850,6 @@
       savedPrompts = [];
       imageLibrary = [];
       usageStats = {};
-      projects = [];
       promptVersions = [];
       debugLogs = [];
       lastPreparedDataUrl = "";
@@ -1912,19 +1878,14 @@
         concurrency: concurrencyInput.value,
         compressQuality: compressQualitySelect.value,
         maxImageSide: maxImageSideSelect.value,
-        projectName: projectNameInput.value,
-        tags: tagInput.value,
       };
       settings.negativePrompt = negativePromptInput.value;
       settings.watermarkText = watermarkTextInput.value;
       settings.fileNamePattern = fileNamePatternSelect.value;
-      settings.dailyQuota = dailyQuotaInput.value;
-      settings.unitCost = unitCostInput.value;
       settings.cleanupHours = cleanupHoursSelect.value;
       settings.cropBeforeUpload = cropBeforeUploadInput.checked;
       settings.notifyDone = notifyDoneInput.checked;
       writeStorage(STORAGE_KEYS.settings, JSON.stringify(settings));
-      persistProjects();
       updateModeFromReferences();
       startQueue();
     }
@@ -1957,15 +1918,6 @@
     function persistStats() {
       writeStorage(STORAGE_KEYS.stats, JSON.stringify(usageStats));
       scheduleStateSync();
-    }
-
-    function persistProjects() {
-      const name = projectNameInput.value.trim();
-      if (name) {
-        projects = [name, ...projects.filter((item) => item !== name)].slice(0, 80);
-        writeStorage(STORAGE_KEYS.projects, JSON.stringify(projects));
-        scheduleStateSync();
-      }
     }
 
     function persistPromptVersions() {
@@ -2071,8 +2023,6 @@
         addLibraryImage({
           name: item.name,
           note: item.note || "",
-          project: currentProject(),
-          tags: currentTags(),
           previewUrl: item.previewUrl,
           url: item.url,
           source: "upload",
@@ -2180,12 +2130,6 @@
 
       const prompts = expandPromptVariables(batchPrompts.length ? batchPrompts : [prompt]);
       const repeatCount = runImmediately || batchPrompts.length ? 1 : clampNumber(taskCountInput.value, 1, 20, 1);
-      const plannedCount = prompts.length * repeatCount;
-      const quotaError = checkDailyQuota(plannedCount);
-      if (quotaError) {
-        setMessage(quotaError, "error");
-        return null;
-      }
       const tasks = [];
       prompts.forEach((taskPrompt) => {
         const input = buildInputPayload(taskPrompt);
@@ -2278,8 +2222,6 @@
             url: item.url,
           })),
         settings: {
-          projectName: currentProject(),
-          tags: currentTags(),
           size: sizeSelect.value,
           aspectRatio: aspectSelect.value,
           customWidth: Number(customWidth.value),
@@ -2542,8 +2484,6 @@
         input: task.input,
         references: task.references,
         settings: task.settings,
-        project: task.settings?.projectName || currentProject(),
-        tags: task.settings?.tags || currentTags(),
         rating: 0,
         favorite: false,
         resultUrls: task.resultUrls,
@@ -2555,8 +2495,6 @@
         addLibraryImage({
           name: `结果 ${index + 1}`,
           note: task.prompt,
-          project: task.settings?.projectName || currentProject(),
-          tags: task.settings?.tags || currentTags(),
           previewUrl: url,
           url,
           source: "result",
@@ -2654,30 +2592,6 @@
       renderHistory();
     }
 
-    function currentProject() {
-      return projectNameInput.value.trim() || "默认项目";
-    }
-
-    function currentTags() {
-      return tagInput.value
-        .split(/[,，\s]+/)
-        .map((tag) => tag.trim())
-        .filter(Boolean)
-        .slice(0, 12);
-    }
-
-    function checkDailyQuota(nextCount) {
-      const quota = clampNumber(dailyQuotaInput.value, 0, 99999, 0);
-      if (!quota) return "";
-      const today = new Date().toISOString().slice(0, 10);
-      const todayStats = usageStats[today] || { submitted: 0, success: 0, failed: 0 };
-      const used = Number(todayStats.submitted || 0);
-      if (used + nextCount > quota) {
-        return `今日配额不足：已提交 ${used} 个，计划新增 ${nextCount} 个，每日配额 ${quota} 个。`;
-      }
-      return "";
-    }
-
     function incrementStats(type, amount = 1) {
       const today = new Date().toISOString().slice(0, 10);
       usageStats[today] = usageStats[today] || { submitted: 0, success: 0, failed: 0 };
@@ -2736,7 +2650,6 @@
         savedPrompts,
         imageLibrary,
         usageStats,
-        projects,
         promptVersions,
         debugLogs,
         settings: readJson(STORAGE_KEYS.settings, {}),
@@ -2765,7 +2678,6 @@
       savedPrompts = Array.isArray(data.savedPrompts) ? data.savedPrompts : savedPrompts;
       imageLibrary = Array.isArray(data.imageLibrary) ? data.imageLibrary : imageLibrary;
       usageStats = data.usageStats && typeof data.usageStats === "object" ? data.usageStats : usageStats;
-      projects = Array.isArray(data.projects) ? data.projects : projects;
       promptVersions = Array.isArray(data.promptVersions) ? data.promptVersions : promptVersions;
       debugLogs = Array.isArray(data.debugLogs) ? data.debugLogs : debugLogs;
       if (data.settings) writeStorage(STORAGE_KEYS.settings, JSON.stringify(data.settings));
@@ -2775,7 +2687,6 @@
       persistSavedPrompts();
       persistLibrary();
       persistStats();
-      writeStorage(STORAGE_KEYS.projects, JSON.stringify(projects));
       persistPromptVersions();
       persistDebugLogs();
       loadLocalState();
@@ -2838,8 +2749,6 @@
       return history.filter((entry) => {
         const haystack = [
           entry.prompt || "",
-          entry.project || "",
-          ...(entry.tags || []),
           ...(entry.references || []).map((item) => `${item.name || ""} ${item.note || ""}`),
         ].join(" ").toLowerCase();
         if (keyword && !haystack.includes(keyword)) return false;
@@ -2933,7 +2842,7 @@
         const button = document.createElement("button");
         button.className = "saved-prompt";
         button.type = "button";
-        button.textContent = `版本 ${formatTime(version.createdAt)} · ${version.project || "默认项目"}`;
+        button.textContent = `版本 ${formatTime(version.createdAt)}`;
         button.title = version.prompt;
         button.addEventListener("click", () => {
           promptInput.value = version.prompt;
@@ -3149,7 +3058,7 @@
         const subtitle = document.createElement("div");
         subtitle.className = "history-subtitle";
         const notes = (entry.references || []).map((item) => item.note).filter(Boolean).join("、");
-        subtitle.textContent = `${formatTime(entry.createdAt)} · ${entry.project || "默认项目"} · ${(entry.tags || []).join("、") || "无标签"} · ${entry.references?.length || 0} 张参考图 · ${entry.resultUrls?.length || 0} 张结果 · 评分 ${entry.rating || 0}${entry.favorite ? " · 已收藏" : ""}${notes ? ` · ${notes}` : ""}`;
+        subtitle.textContent = `${formatTime(entry.createdAt)} · ${entry.references?.length || 0} 张参考图 · ${entry.resultUrls?.length || 0} 张结果 · 评分 ${entry.rating || 0}${entry.favorite ? " · 已收藏" : ""}${notes ? ` · ${notes}` : ""}`;
         meta.append(title, subtitle);
         head.append(meta);
         item.append(head);
@@ -3186,8 +3095,6 @@
         const haystack = [
           image.name || "",
           image.note || "",
-          image.project || "",
-          ...(image.tags || []),
           image.source || "",
         ].join(" ").toLowerCase();
         return !keyword || haystack.includes(keyword);
@@ -3206,7 +3113,7 @@
         title.textContent = `${image.source === "result" ? "结果" : "参考"} · ${image.name || "图片"}`;
         const subtitle = document.createElement("div");
         subtitle.className = "history-subtitle";
-        subtitle.textContent = `${formatTime(image.createdAt)} · ${image.project || "默认项目"} · ${(image.tags || []).join("、") || "无标签"}${image.note ? ` · ${image.note}` : ""}`;
+        subtitle.textContent = `${formatTime(image.createdAt)}${image.note ? ` · ${image.note}` : ""}`;
         const images = document.createElement("div");
         images.className = "history-images";
         const img = document.createElement("img");
@@ -3227,18 +3134,12 @@
     function renderAdminSummary() {
       const today = new Date().toISOString().slice(0, 10);
       const todayStats = usageStats[today] || { submitted: 0, success: 0, failed: 0 };
-      const quota = clampNumber(dailyQuotaInput.value, 0, 99999, 0);
-      const unitCost = Math.max(0, Number(unitCostInput.value) || 0);
       const submitted = Number(todayStats.submitted || 0);
-      const cost = submitted * unitCost;
-      const quotaText = quota ? ` / 剩余 ${Math.max(0, quota - submitted)}` : "";
-      const costText = unitCost ? ` / 约 ${formatMoney(cost)}` : "";
-      statsText.textContent = `今日 ${submitted} 提交 / ${todayStats.success || 0} 成功 / ${todayStats.failed || 0} 失败${quotaText}${costText}`;
+      statsText.textContent = `今日 ${submitted} 提交 / ${todayStats.success || 0} 成功 / ${todayStats.failed || 0} 失败`;
       if (!adminList.innerHTML.trim()) {
         adminList.innerHTML = `
           <div class="admin-item">当前用户：${escapeHtml(getCurrentUser())}</div>
-          <div class="admin-item">每日配额：${quota ? `${submitted}/${quota}` : "不限"}</div>
-          <div class="admin-item">预估成本：${unitCost ? formatMoney(cost) : "未设置单图成本"}</div>
+          <div class="admin-item">今日提交：${submitted}</div>
         `;
       }
     }
@@ -3250,8 +3151,6 @@
       const cleanupText = data.cleanup ? `本次清理：${data.cleanup.deletedCount || 0} 个文件` : "";
       const today = new Date().toISOString().slice(0, 10);
       const todayStats = usageStats[today] || { submitted: 0, success: 0, failed: 0 };
-      const quota = clampNumber(dailyQuotaInput.value, 0, 99999, 0);
-      const unitCost = Math.max(0, Number(unitCostInput.value) || 0);
       const submitted = Number(todayStats.submitted || 0);
       adminList.innerHTML = `
         <div class="admin-item">当前用户：${escapeHtml(getCurrentUser())}</div>
@@ -3259,8 +3158,7 @@
         <div class="admin-item">API Key：${hasUsableApiKey() ? "浏览器已保存" : "未填写"}</div>
         <div class="admin-item">SQLite：${data.database?.enabled ? `已启用，${data.database.states || 0} 个用户状态` : "未启用"}</div>
         <div class="admin-item">${escapeHtml(uploadText)}</div>
-        <div class="admin-item">每日配额：${quota ? `${submitted}/${quota}，剩余 ${Math.max(0, quota - submitted)}` : "不限"}</div>
-        <div class="admin-item">预估成本：${unitCost ? formatMoney(submitted * unitCost) : "未设置单图成本"}</div>
+        <div class="admin-item">今日提交：${submitted}，成功 ${todayStats.success || 0}，失败 ${todayStats.failed || 0}</div>
         ${cleanupText ? `<div class="admin-item">${escapeHtml(cleanupText)}</div>` : ""}
       `;
     }
@@ -3362,8 +3260,6 @@
       promptVersions.unshift({
         id: createId(),
         createdAt: Date.now(),
-        project: currentProject(),
-        tags: currentTags(),
         prompt,
       });
       promptVersions = promptVersions.slice(0, 100);
@@ -3379,8 +3275,6 @@
       const input = buildInputPayload(prompt);
       addDebugLog("当前提交参数预览", JSON.stringify({
         user: getCurrentUser(),
-        project: currentProject(),
-        tags: currentTags(),
         input,
       }, null, 2));
       setMessage("提交参数已显示在调试面板。", "success");
@@ -3424,11 +3318,6 @@
         return;
       }
       const selectedItems = items.slice(0, 30);
-      const quotaError = checkDailyQuota(selectedItems.length);
-      if (quotaError) {
-        setMessage(quotaError, "error");
-        return;
-      }
       selectedItems.forEach((entry) => {
         const input = buildInputForReferences(entry.prompt, (entry.references || []).map((item) => item.url).filter(Boolean));
         queue.unshift({
