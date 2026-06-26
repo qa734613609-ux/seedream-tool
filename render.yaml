@@ -10,9 +10,5 @@ services:
         value: production
       - key: PORT
         value: 3000
-      - key: VMODEL_API_KEY
-        sync: false
       - key: VMODEL_SEEDREAM_VERSION
         value: 4ce713043ea0275271d7b65741005f5489b1218c4dfc012cc06763654a92a0aa
-      - key: APP_PASSWORD
-        generateValue: true

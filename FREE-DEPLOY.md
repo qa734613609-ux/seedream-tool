@@ -25,11 +25,7 @@ https://seedream-tool.onrender.com
 3. 选择 `New` -> `Blueprint`
 4. 连接你的 GitHub 仓库
 5. Render 会读取 `render.yaml`
-6. 填写环境变量 `VMODEL_API_KEY`
-7. 部署
-
-`APP_PASSWORD` 会由 Render 自动生成。部署完成后，在 Render 服务的
-`Environment` 页面查看这个密码，发给允许访问的人。
+6. 部署
 
 ## 3. 访问
 
@@ -39,7 +35,7 @@ https://seedream-tool.onrender.com
 https://你的服务名.onrender.com
 ```
 
-打开这个网址，输入 `APP_PASSWORD`，即可使用。
+打开这个网址后，访问者需要在网页里填写自己的 VModel API Key，保存后即可使用。
 
 ## 4. 本地图上传说明
 

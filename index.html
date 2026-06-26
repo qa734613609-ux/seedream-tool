@@ -944,16 +944,7 @@
               <input type="password" id="apiKeyInput" autocomplete="off" placeholder="填写 VModel API Key" />
               <button class="btn btn-secondary" id="saveApiKeyBtn" type="button">保存</button>
             </div>
-            <div class="hint" id="apiKeyHint">也可以继续使用 .env 里的 API Key。</div>
-          </div>
-
-          <div class="field" id="loginField" style="display:none;">
-            <label for="appPasswordInput">访问密码 <span>局域网共享保护</span></label>
-            <div class="api-row">
-              <input type="password" id="appPasswordInput" autocomplete="current-password" placeholder="输入访问密码" />
-              <button class="btn btn-secondary" id="loginBtn" type="button">登录</button>
-            </div>
-            <div class="hint" id="loginHint">后端设置 APP_PASSWORD 时需要登录。</div>
+            <div class="hint" id="apiKeyHint">访问者需要填写自己的 VModel API Key。</div>
           </div>
 
           <div class="field">
@@ -1293,7 +1284,6 @@
       userProfile: "xiaolin_wuyou_user_profile_v1",
       library: "xiaolin_wuyou_library_v1",
       stats: "xiaolin_wuyou_stats_v1",
-      appToken: "xiaolin_wuyou_app_token_v1",
       projects: "xiaolin_wuyou_projects_v1",
       promptVersions: "xiaolin_wuyou_prompt_versions_v1",
       debugLogs: "xiaolin_wuyou_debug_logs_v1",
@@ -1306,10 +1296,6 @@
     const apiKeyInput = document.getElementById("apiKeyInput");
     const saveApiKeyBtn = document.getElementById("saveApiKeyBtn");
     const apiKeyHint = document.getElementById("apiKeyHint");
-    const loginField = document.getElementById("loginField");
-    const appPasswordInput = document.getElementById("appPasswordInput");
-    const loginBtn = document.getElementById("loginBtn");
-    const loginHint = document.getElementById("loginHint");
     const userProfileInput = document.getElementById("userProfile");
     const switchUserBtn = document.getElementById("switchUserBtn");
     const projectNameInput = document.getElementById("projectName");
@@ -1397,7 +1383,6 @@
     const cancelConfirmBtn = document.getElementById("cancelConfirmBtn");
     const confirmSubmitBtn = document.getElementById("confirmSubmitBtn");
 
-    let hasEnvApiKey = false;
     let referenceImages = [];
     let queue = [];
     let history = [];
@@ -1407,7 +1392,6 @@
     let projects = [];
     let promptVersions = [];
     let debugLogs = [];
-    let authRequired = false;
     let hasDatabase = false;
     let lastPreparedDataUrl = "";
     let pendingEditResolve = null;
@@ -1430,7 +1414,6 @@
     }
 
     function bindEvents() {
-      loginBtn.addEventListener("click", loginApp);
       switchUserBtn.addEventListener("click", switchUserProfile);
       saveApiKeyBtn.addEventListener("click", saveApiKey);
       apiKeyInput.addEventListener("input", () => {
@@ -1522,41 +1505,17 @@
       try {
         const response = await fetch("/api/config");
         const data = await response.json();
-        hasEnvApiKey = Boolean(data.hasApiKey);
-        authRequired = Boolean(data.authRequired);
         hasDatabase = Boolean(data.hasDatabase);
-        loginField.style.display = authRequired && !readAppToken() ? "block" : "none";
         updateApiState();
-        setMessage(hasUsableApiKey() ? "服务已就绪，可以提交任务。" : "请在网页填写 API Key，或在 .env 中配置 API Key。", hasUsableApiKey() ? "success" : "error");
+        setMessage(hasUsableApiKey() ? "服务已就绪，可以提交任务。" : "请在网页填写 VModel API Key。", hasUsableApiKey() ? "success" : "error");
       } catch {
-        hasEnvApiKey = false;
         updateApiState();
         setMessage("无法连接本地服务，请确认 start-server.cmd 正在运行。", "error");
       }
     }
 
-    async function loginApp() {
-      try {
-        const response = await fetch("/api/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password: appPasswordInput.value }),
-        });
-        const data = await safeJson(response);
-        if (!response.ok || data.error) throw new Error(readErrorMessage(data, "登录失败"));
-        localStorage.setItem(STORAGE_KEYS.appToken, data.token || "");
-        loginField.style.display = "none";
-        loginHint.textContent = "已登录。";
-        setMessage("访问密码已通过。", "success");
-        await loadRemoteState();
-        refreshAdminStatus();
-      } catch (error) {
-        setMessage(error.message || "登录失败。", "error");
-      }
-    }
-
     async function loadRemoteState() {
-      if (!hasDatabase || (authRequired && !readAppToken())) return;
+      if (!hasDatabase) return;
       try {
         const response = await fetch(`/api/state?user=${encodeURIComponent(getCurrentUser())}`, {
           headers: authHeaders(),
@@ -1571,17 +1530,13 @@
         renderAll();
         setMessage("已从 SQLite 数据库恢复本用户数据。", "success");
       } catch (error) {
-        if (/需要访问密码|401/.test(error.message || "")) {
-          localStorage.removeItem(STORAGE_KEYS.appToken);
-          loginField.style.display = "block";
-        }
         addDebugLog("数据库读取失败", error.message || String(error));
       }
     }
 
     async function syncStateToDatabase(showMessage = true) {
-      if (!hasDatabase || (authRequired && !readAppToken())) {
-        if (showMessage) setMessage("数据库不可用，或需要先输入访问密码。", "error");
+      if (!hasDatabase) {
+        if (showMessage) setMessage("数据库不可用。", "error");
         return;
       }
       try {
@@ -1594,36 +1549,24 @@
         if (!response.ok || data.error) throw new Error(readErrorMessage(data, "同步数据库失败"));
         if (showMessage) setMessage("已同步到 SQLite 数据库。", "success");
       } catch (error) {
-        if (/需要访问密码|401/.test(error.message || "")) {
-          localStorage.removeItem(STORAGE_KEYS.appToken);
-          loginField.style.display = "block";
-        }
         setMessage(error.message || "同步数据库失败。", "error");
       }
     }
 
     function updateApiState() {
       const hasBrowserKey = Boolean(readApiKey());
-      const ready = hasBrowserKey || hasEnvApiKey;
-      configDot.classList.toggle("ready", ready);
-      configText.textContent = ready ? (hasBrowserKey ? "API 已保存" : "使用 .env API") : "API 未配置";
+      configDot.classList.toggle("ready", hasBrowserKey);
+      configText.textContent = hasBrowserKey ? "API 已保存" : "API 未配置";
       apiKeyHint.textContent = hasBrowserKey
         ? "API Key 已保存在当前浏览器，刷新不会丢失。"
-        : hasEnvApiKey
-        ? "当前使用 .env 中的 API Key，也可以在这里填写覆盖。"
-        : "请填写 VModel API Key。";
+        : "请填写自己的 VModel API Key。";
     }
 
     function authHeaders(extra = {}) {
       return {
         "Content-Type": "application/json",
-        ...(readAppToken() ? { "X-App-Token": readAppToken() } : {}),
         ...extra,
       };
-    }
-
-    function readAppToken() {
-      return String(localStorage.getItem(STORAGE_KEYS.appToken) || "").trim();
     }
 
     function saveApiKey() {
@@ -1752,7 +1695,7 @@
     }
 
     function scheduleStateSync() {
-      if (!hasDatabase || (authRequired && !readAppToken())) return;
+      if (!hasDatabase) return;
       clearTimeout(syncTimer);
       syncTimer = setTimeout(() => syncStateToDatabase(false), 1200);
     }
@@ -1925,7 +1868,7 @@
 
     function createSubmitPlan(runImmediately) {
       if (!hasUsableApiKey()) {
-        setMessage("请先填写并保存 API Key，或在 .env 中配置 API Key。", "error");
+        setMessage("请先填写并保存自己的 VModel API Key。", "error");
         apiKeyInput.focus();
         return null;
       }
@@ -3030,8 +2973,7 @@
       adminList.innerHTML = `
         <div class="admin-item">当前用户：${escapeHtml(getCurrentUser())}</div>
         <div class="admin-item">模型：${escapeHtml(data.model || "Seedream 4.5")}</div>
-        <div class="admin-item">API Key：${data.hasApiKey ? "已配置" : "未配置"}</div>
-        <div class="admin-item">访问密码：${data.authRequired ? "已启用" : "未启用"}</div>
+        <div class="admin-item">API Key：${hasUsableApiKey() ? "浏览器已保存" : "未填写"}</div>
         <div class="admin-item">SQLite：${data.database?.enabled ? `已启用，${data.database.states || 0} 个用户状态` : "未启用"}</div>
         <div class="admin-item">${escapeHtml(uploadText)}</div>
         <div class="admin-item">每日配额：${quota ? `${submitted}/${quota}，剩余 ${Math.max(0, quota - submitted)}` : "不限"}</div>
@@ -3407,7 +3349,7 @@
     }
 
     function hasUsableApiKey() {
-      return Boolean(readApiKey() || hasEnvApiKey);
+      return Boolean(readApiKey());
     }
 
     function readApiKey() {

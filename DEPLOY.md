@@ -24,13 +24,13 @@
 在服务器项目目录创建 `.env`：
 
 ```env
-VMODEL_API_KEY=你的_vmodel_api_key
 VMODEL_SEEDREAM_VERSION=4ce713043ea0275271d7b65741005f5489b1218c4dfc012cc06763654a92a0aa
 PORT=3000
 PUBLIC_BASE_URL=https://seedream.example.com
 ```
 
 `PUBLIC_BASE_URL` 必须是公网 HTTPS 地址，不要写 `localhost`。
+VModel API Key 不放在服务器环境变量里，访问者需要在网页中填写自己的 Key。
 
 ## 3. 启动服务
 

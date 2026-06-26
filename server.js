@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
@@ -22,10 +21,6 @@ const VERSION_ID =
 const UPLOAD_DIR = path.join(__dirname, "uploads");
 const DATA_DIR = path.join(__dirname, "data");
 const DB_PATH = path.join(DATA_DIR, "xiaolin-wuyou.sqlite");
-const APP_PASSWORD = String(process.env.APP_PASSWORD || "").trim();
-const APP_PASSWORD_TOKEN = APP_PASSWORD
-  ? crypto.createHash("sha256").update(APP_PASSWORD).digest("hex")
-  : "";
 
 const db = initDatabase();
 
@@ -46,19 +41,6 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
 
-app.post("/api/login", (req, res) => {
-  if (!APP_PASSWORD) {
-    return res.json({ ok: true, authRequired: false, token: "" });
-  }
-
-  const password = String(req.body?.password || "");
-  if (password !== APP_PASSWORD) {
-    return res.status(401).json({ error: "访问密码错误。" });
-  }
-
-  res.json({ ok: true, authRequired: true, token: APP_PASSWORD_TOKEN });
-});
-
 app.get("/api/config", (req, res) => {
   const configuredPublicBaseUrl = String(process.env.PUBLIC_BASE_URL || "").trim().replace(/\/+$/, "");
   const requestBaseUrl = getRequestBaseUrl(req);
@@ -68,12 +50,11 @@ app.get("/api/config", (req, res) => {
   res.json({
     ok: true,
     model: "bytedance/seedream-4.5",
-    hasApiKey: Boolean(getApiKey()),
+    hasApiKey: false,
     publicBaseUrl,
     canUseLocalUploadForVmodel: isPublicHttpUrl(requestBaseUrl),
     acceptsDataUrlImageInput: false,
     hasTemporaryPublicUpload: true,
-    authRequired: Boolean(APP_PASSWORD),
     hasDatabase: Boolean(db),
     version: VERSION_ID,
   });
@@ -150,8 +131,8 @@ app.post("/api/create", requireAuth, async (req, res) => {
   const apiKey = getApiKey(req.body?.token);
 
   if (!apiKey) {
-    return res.status(500).json({
-      error: "缺少 VMODEL_API_KEY，请在 .env 中配置后重启服务。",
+    return res.status(400).json({
+      error: "请先在网页填写 VModel API Key。",
     });
   }
 
@@ -193,8 +174,8 @@ app.get("/api/status/:taskId", requireAuth, async (req, res) => {
   const apiKey = getApiKey(req.headers.authorization?.replace(/^Bearer\s+/i, ""));
 
   if (!apiKey) {
-    return res.status(500).json({
-      error: "缺少 VMODEL_API_KEY，请在 .env 中配置后重启服务。",
+    return res.status(400).json({
+      error: "请先在网页填写 VModel API Key。",
     });
   }
 
@@ -252,12 +233,11 @@ app.get("/api/admin/status", requireAuth, (_req, res) => {
     ok: true,
     port: PORT,
     model: "bytedance/seedream-4.5",
-    hasApiKey: Boolean(getApiKey()),
+    hasApiKey: false,
     createUrl: CREATE_URL,
     taskGetUrl: TASK_GET_URL,
     uploadDir: UPLOAD_DIR,
     uploads: uploadStats,
-    authRequired: Boolean(APP_PASSWORD),
     database: db ? { enabled: true, path: DB_PATH, states: getStateCount() } : { enabled: false },
     uptimeSeconds: Math.round(process.uptime()),
     memory: process.memoryUsage(),
@@ -341,11 +321,11 @@ app.use((req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Seedream 图生图工具运行在 http://localhost:${PORT}`);
-  console.log(`VModel API Key: ${getApiKey() ? "已配置" : "未配置"}`);
+  console.log("VModel API Key: 由访问者在网页填写");
 });
 
 function getApiKey(fallbackToken) {
-  return String(process.env.VMODEL_API_KEY || fallbackToken || "").trim();
+  return String(fallbackToken || "").trim();
 }
 
 function normalizeInput(input = {}) {
@@ -431,11 +411,8 @@ function clampNumber(value, min, max, fallback) {
   return Math.max(min, Math.min(max, Math.round(number)));
 }
 
-function requireAuth(req, res, next) {
-  if (!APP_PASSWORD) return next();
-  const token = String(req.headers["x-app-token"] || (req.body && req.body.appToken) || req.query.appToken || "").trim();
-  if (token && token === APP_PASSWORD_TOKEN) return next();
-  return res.status(401).json({ error: "需要访问密码。请先在网页登录。" });
+function requireAuth(_req, _res, next) {
+  return next();
 }
 
 function initDatabase() {

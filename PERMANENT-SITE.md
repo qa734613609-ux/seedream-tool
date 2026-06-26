@@ -14,12 +14,12 @@
 服务器 `.env` 示例：
 
 ```env
-VMODEL_API_KEY=你的_vmodel_api_key
 VMODEL_SEEDREAM_VERSION=4ce713043ea0275271d7b65741005f5489b1218c4dfc012cc06763654a92a0aa
 PORT=3000
 PUBLIC_BASE_URL=https://image.example.com
-APP_PASSWORD=你的访问密码
 ```
+
+VModel API Key 不放在服务器上。访问者打开网页后，需要填写自己的 Key 才能生图。
 
 启动服务：
 
@@ -101,5 +101,5 @@ PUBLIC_BASE_URL=https://image.example.com
 ## 重要
 
 - `PUBLIC_BASE_URL` 必须是公网 HTTPS 地址，不能是 `localhost`。
-- 对外开放时必须设置 `APP_PASSWORD`，否则别人会消耗你的 API Key。
+- 对外开放后，访问者必须填写自己的 VModel API Key；服务器不会使用共享 Key。
 - `uploads/` 和 `data/` 都需要持久化；当前 `docker-compose.yml` 已经挂载这两个目录。
