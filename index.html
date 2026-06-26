@@ -13,27 +13,28 @@
 
     :root {
       color-scheme: light;
-      --bg: #eef3f6;
+      --bg: #edf2f4;
       --panel: #ffffff;
-      --panel-soft: #f6fafb;
-      --text: #132033;
-      --muted: #637083;
-      --line: #d8e2e8;
-      --primary: #0f766e;
-      --primary-dark: #115e59;
-      --accent: #b45309;
+      --panel-soft: #f7f9fb;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d7dee8;
+      --primary: #0d7c66;
+      --primary-dark: #075e50;
+      --accent: #8a5a00;
       --danger: #b42318;
       --success: #087443;
       --warning: #a15c07;
       --radius: 8px;
-      --shadow: 0 20px 50px rgba(19, 32, 51, 0.1);
+      --shadow: 0 16px 44px rgba(23, 32, 51, 0.08);
     }
 
     body {
       margin: 0;
       min-height: 100vh;
       background:
-        linear-gradient(180deg, rgba(15, 118, 110, 0.08), transparent 340px),
+        linear-gradient(180deg, rgba(13, 124, 102, 0.1), transparent 320px),
+        linear-gradient(90deg, rgba(138, 90, 0, 0.05), transparent 380px),
         var(--bg);
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -55,7 +56,75 @@
     .app {
       width: min(1540px, 100%);
       margin: 0 auto;
+      padding: 24px;
+    }
+
+    .auth-view {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+
+    .auth-card {
+      width: min(440px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
       padding: 26px;
+    }
+
+    .auth-card h1 {
+      margin-bottom: 10px;
+      font-size: 30px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 18px 0;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #f7fafc;
+    }
+
+    .auth-tab {
+      min-height: 36px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 720;
+    }
+
+    .auth-tab.active {
+      background: #fff;
+      color: var(--primary-dark);
+      box-shadow: 0 8px 20px rgba(19, 32, 51, 0.08);
+    }
+
+    .auth-message {
+      min-height: 22px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .auth-message.error {
+      color: var(--danger);
+    }
+
+    .auth-message.success {
+      color: var(--success);
+    }
+
+    .app[hidden],
+    .auth-view[hidden] {
+      display: none;
     }
 
     .topbar {
@@ -64,6 +133,33 @@
       gap: 20px;
       align-items: flex-start;
       margin-bottom: 18px;
+      padding: 4px 0 6px;
+    }
+
+    .top-actions {
+      display: grid;
+      justify-items: end;
+      gap: 10px;
+    }
+
+    .account-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: #243047;
+      font-size: 13px;
+      box-shadow: 0 8px 22px rgba(19, 32, 51, 0.06);
+    }
+
+    .account-chip .small-btn {
+      min-height: 28px;
+      padding: 5px 9px;
+      border-radius: 999px;
     }
 
     h1 {
@@ -117,7 +213,7 @@
     .panel {
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255, 255, 255, 0.94);
       box-shadow: var(--shadow);
     }
 
@@ -183,7 +279,7 @@
     input:focus {
       border-color: var(--primary);
       background: #fff;
-      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+      box-shadow: 0 0 0 3px rgba(13, 124, 102, 0.14);
     }
 
     textarea {
@@ -460,6 +556,7 @@
       font-weight: 740;
       text-decoration: none;
       transition: transform 0.12s ease, background 0.16s ease, opacity 0.16s ease;
+      box-shadow: 0 8px 18px rgba(23, 32, 51, 0.06);
     }
 
     .btn:active {
@@ -475,7 +572,7 @@
     .btn-primary {
       flex: 1 1 180px;
       color: #fff;
-      background: var(--primary);
+      background: linear-gradient(180deg, #108a71, var(--primary));
     }
 
     .btn-primary:hover {
@@ -484,11 +581,12 @@
 
     .btn-secondary {
       color: #243047;
-      background: #eef2f7;
+      background: #eef3f6;
+      border: 1px solid #dce4ec;
     }
 
     .btn-secondary:hover {
-      background: #e3e9f2;
+      background: #e2e9f0;
     }
 
     .btn-danger {
@@ -882,6 +980,11 @@
         display: block;
       }
 
+      .top-actions {
+        justify-items: start;
+        margin-top: 14px;
+      }
+
       .panel {
         margin-bottom: 16px;
       }
@@ -916,11 +1019,40 @@
       .task-id {
         text-align: left;
       }
+
+      .auth-view {
+        padding: 14px;
+      }
+
+      .auth-card {
+        padding: 18px;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="app">
+  <section class="auth-view" id="authView">
+    <form class="auth-card" id="authForm">
+      <h1>小林无忧生图</h1>
+      <p class="subtitle">注册或登录后使用。每个账号的历史、队列、收藏和素材库互相隔离。</p>
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab active" id="loginTab" type="button">登录</button>
+        <button class="auth-tab" id="registerTab" type="button">注册</button>
+      </div>
+      <div class="field">
+        <label for="authUsername">账号 <span>3-40 位</span></label>
+        <input type="text" id="authUsername" autocomplete="username" placeholder="输入账号" />
+      </div>
+      <div class="field">
+        <label for="authPassword">密码 <span>至少 6 位</span></label>
+        <input type="password" id="authPassword" autocomplete="current-password" placeholder="输入密码" />
+      </div>
+      <button class="btn btn-primary" id="authSubmitBtn" type="submit">登录</button>
+      <p class="auth-message" id="authMessage">登录后再填写自己的 VModel API Key。</p>
+    </form>
+  </section>
+
+  <main class="app" id="appView" hidden>
     <header class="topbar">
       <div>
         <h1>小林无忧生图</h1>
@@ -928,9 +1060,15 @@
           支持本地多参考图、任务队列、失败自动重试、历史记录和一键重新生图。API Key 会保存在当前浏览器，不刷新丢失。
         </p>
       </div>
-      <div class="status-pill" id="configStatus">
-        <span class="dot" id="configDot"></span>
-        <span id="configText">检查 API 配置中</span>
+      <div class="top-actions">
+        <div class="status-pill" id="configStatus">
+          <span class="dot" id="configDot"></span>
+          <span id="configText">检查 API 配置中</span>
+        </div>
+        <div class="account-chip">
+          <span id="currentAccountText">未登录</span>
+          <button class="small-btn" id="logoutBtn" type="button">退出</button>
+        </div>
       </div>
     </header>
 
@@ -945,14 +1083,6 @@
               <button class="btn btn-secondary" id="saveApiKeyBtn" type="button">保存</button>
             </div>
             <div class="hint" id="apiKeyHint">访问者需要填写自己的 VModel API Key。</div>
-          </div>
-
-          <div class="field">
-            <label for="userProfile">用户/账号 <span>隔离历史、队列、收藏</span></label>
-            <div class="api-row">
-              <input type="text" id="userProfile" placeholder="default" />
-              <button class="btn btn-secondary" id="switchUserBtn" type="button">切换</button>
-            </div>
           </div>
 
           <div class="grid-2">
@@ -1281,7 +1411,8 @@
       settings: "xiaolin_wuyou_settings_v1",
       savedPrompts: "xiaolin_wuyou_saved_prompts_v1",
       batchPrompts: "xiaolin_wuyou_batch_prompts_v1",
-      userProfile: "xiaolin_wuyou_user_profile_v1",
+      authToken: "xiaolin_wuyou_auth_token_v1",
+      authUser: "xiaolin_wuyou_auth_user_v1",
       library: "xiaolin_wuyou_library_v1",
       stats: "xiaolin_wuyou_stats_v1",
       projects: "xiaolin_wuyou_projects_v1",
@@ -1292,12 +1423,21 @@
     const MAX_HISTORY = 80;
     const MAX_RETRIES = 2;
 
+    const authView = document.getElementById("authView");
+    const appView = document.getElementById("appView");
+    const authForm = document.getElementById("authForm");
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const authUsernameInput = document.getElementById("authUsername");
+    const authPasswordInput = document.getElementById("authPassword");
+    const authSubmitBtn = document.getElementById("authSubmitBtn");
+    const authMessage = document.getElementById("authMessage");
+    const currentAccountText = document.getElementById("currentAccountText");
+    const logoutBtn = document.getElementById("logoutBtn");
     const form = document.getElementById("generateForm");
     const apiKeyInput = document.getElementById("apiKeyInput");
     const saveApiKeyBtn = document.getElementById("saveApiKeyBtn");
     const apiKeyHint = document.getElementById("apiKeyHint");
-    const userProfileInput = document.getElementById("userProfile");
-    const switchUserBtn = document.getElementById("switchUserBtn");
     const projectNameInput = document.getElementById("projectName");
     const tagInput = document.getElementById("tagInput");
     const imageInput = document.getElementById("imageInput");
@@ -1392,6 +1532,8 @@
     let projects = [];
     let promptVersions = [];
     let debugLogs = [];
+    let currentUser = "";
+    let authMode = "login";
     let hasDatabase = false;
     let lastPreparedDataUrl = "";
     let pendingEditResolve = null;
@@ -1403,18 +1545,17 @@
     init();
 
     async function init() {
-      loadLocalState();
       bindEvents();
-      renderAll();
       await checkConfig();
-      await loadRemoteState();
-      refreshAdminStatus();
       registerPwa();
-      startQueue();
+      await checkAuth();
     }
 
     function bindEvents() {
-      switchUserBtn.addEventListener("click", switchUserProfile);
+      loginTab.addEventListener("click", () => setAuthMode("login"));
+      registerTab.addEventListener("click", () => setAuthMode("register"));
+      authForm.addEventListener("submit", handleAuthSubmit);
+      logoutBtn.addEventListener("click", logoutAccount);
       saveApiKeyBtn.addEventListener("click", saveApiKey);
       apiKeyInput.addEventListener("input", () => {
         writeStorage(STORAGE_KEYS.apiKey, apiKeyInput.value.trim());
@@ -1514,13 +1655,120 @@
       }
     }
 
+    async function checkAuth() {
+      if (!readAuthToken()) {
+        showAuthView("请先登录或注册账号。", "");
+        return;
+      }
+      try {
+        const response = await fetch("/api/auth/me", { headers: authHeaders() });
+        const data = await safeJson(response);
+        if (!response.ok || data.error || !data.authenticated) {
+          clearAuthSession();
+          showAuthView("登录已过期，请重新登录。", "error");
+          return;
+        }
+        await enterApp(data.user);
+      } catch (error) {
+        showAuthView(error.message || "无法检查登录状态。", "error");
+      }
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode === "register" ? "register" : "login";
+      loginTab.classList.toggle("active", authMode === "login");
+      registerTab.classList.toggle("active", authMode === "register");
+      authSubmitBtn.textContent = authMode === "register" ? "注册并登录" : "登录";
+      authPasswordInput.autocomplete = authMode === "register" ? "new-password" : "current-password";
+      setAuthMessage(authMode === "register" ? "注册后会自动登录。" : "登录后恢复你的个人历史。", "");
+    }
+
+    async function handleAuthSubmit(event) {
+      event.preventDefault();
+      const username = authUsernameInput.value.trim();
+      const password = authPasswordInput.value;
+      if (!username || !password) {
+        setAuthMessage("请填写账号和密码。", "error");
+        return;
+      }
+      try {
+        authSubmitBtn.disabled = true;
+        setAuthMessage(authMode === "register" ? "正在注册..." : "正在登录...", "");
+        const response = await fetch(`/api/auth/${authMode === "register" ? "register" : "login"}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await safeJson(response);
+        if (!response.ok || data.error) throw new Error(readErrorMessage(data, authMode === "register" ? "注册失败" : "登录失败"));
+        localStorage.setItem(STORAGE_KEYS.authToken, data.token || "");
+        localStorage.setItem(STORAGE_KEYS.authUser, data.user || username);
+        authPasswordInput.value = "";
+        await enterApp(data.user || username);
+      } catch (error) {
+        setAuthMessage(error.message || "操作失败。", "error");
+      } finally {
+        authSubmitBtn.disabled = false;
+      }
+    }
+
+    async function enterApp(user) {
+      currentUser = String(user || "").trim();
+      if (!currentUser) {
+        clearAuthSession();
+        showAuthView("登录状态无效，请重新登录。", "error");
+        return;
+      }
+      currentAccountText.textContent = `账号：${currentUser}`;
+      authView.hidden = true;
+      appView.hidden = false;
+      resetRuntimeState();
+      loadLocalState();
+      renderAll();
+      await loadRemoteState();
+      refreshAdminStatus();
+      startQueue();
+    }
+
+    async function logoutAccount() {
+      try {
+        await fetch("/api/auth/logout", { method: "POST", headers: authHeaders() });
+      } catch {
+        // logout is best-effort
+      }
+      clearAuthSession();
+      resetRuntimeState();
+      renderAll();
+      showAuthView("已退出登录。", "success");
+    }
+
+    function showAuthView(text, type) {
+      appView.hidden = true;
+      authView.hidden = false;
+      currentUser = "";
+      currentAccountText.textContent = "未登录";
+      setAuthMessage(text, type);
+      authUsernameInput.value = localStorage.getItem(STORAGE_KEYS.authUser) || "";
+      authUsernameInput.focus();
+    }
+
+    function setAuthMessage(text, type) {
+      authMessage.className = type ? `auth-message ${type}` : "auth-message";
+      authMessage.textContent = text || "";
+    }
+
+    function clearAuthSession() {
+      localStorage.removeItem(STORAGE_KEYS.authToken);
+    }
+
     async function loadRemoteState() {
       if (!hasDatabase) return;
       try {
-        const response = await fetch(`/api/state?user=${encodeURIComponent(getCurrentUser())}`, {
+        const response = await fetch("/api/state", {
           headers: authHeaders(),
         });
         const data = await safeJson(response);
+        if (response.status === 401) return handleAuthExpired();
         if (!response.ok || data.error) throw new Error(readErrorMessage(data, "读取数据库状态失败"));
         if (!data.data || !Object.keys(data.data).length) {
           await syncStateToDatabase(false);
@@ -1543,12 +1791,17 @@
         const response = await fetch("/api/state", {
           method: "POST",
           headers: authHeaders(),
-          body: JSON.stringify({ user: getCurrentUser(), data: collectExportData() }),
+          body: JSON.stringify({ data: collectExportData() }),
         });
         const data = await safeJson(response);
+        if (response.status === 401) return handleAuthExpired();
         if (!response.ok || data.error) throw new Error(readErrorMessage(data, "同步数据库失败"));
         if (showMessage) setMessage("已同步到 SQLite 数据库。", "success");
       } catch (error) {
+        if (/请先登录账号|401/.test(error.message || "")) {
+          handleAuthExpired();
+          return;
+        }
         setMessage(error.message || "同步数据库失败。", "error");
       }
     }
@@ -1565,8 +1818,20 @@
     function authHeaders(extra = {}) {
       return {
         "Content-Type": "application/json",
+        ...(readAuthToken() ? { "X-Session-Token": readAuthToken() } : {}),
         ...extra,
       };
+    }
+
+    function readAuthToken() {
+      return String(localStorage.getItem(STORAGE_KEYS.authToken) || "").trim();
+    }
+
+    function handleAuthExpired() {
+      clearAuthSession();
+      resetRuntimeState();
+      renderAll();
+      showAuthView("登录已过期，请重新登录。", "error");
     }
 
     function saveApiKey() {
@@ -1576,7 +1841,6 @@
     }
 
     function loadLocalState() {
-      userProfileInput.value = getCurrentUser();
       apiKeyInput.value = readStorage(STORAGE_KEYS.apiKey) || "";
       promptInput.value = readStorage(STORAGE_KEYS.prompt) || "";
       batchPromptsInput.value = readStorage(STORAGE_KEYS.batchPrompts) || "";
@@ -1610,6 +1874,25 @@
       cropBeforeUploadInput.checked = Boolean(settings.cropBeforeUpload);
       notifyDoneInput.checked = Boolean(settings.notifyDone);
       updateModeFromReferences();
+    }
+
+    function resetRuntimeState() {
+      referenceImages = [];
+      queue = [];
+      history = [];
+      savedPrompts = [];
+      imageLibrary = [];
+      usageStats = {};
+      projects = [];
+      promptVersions = [];
+      debugLogs = [];
+      lastPreparedDataUrl = "";
+      pendingEditResolve = null;
+      queuePaused = false;
+      activeCount = 0;
+      pendingSubmitPlan = null;
+      clearTimeout(syncTimer);
+      syncTimer = null;
     }
 
     function normalizeSavedTask(task) {
@@ -3591,11 +3874,11 @@
     }
 
     function getCurrentUser() {
-      return (localStorage.getItem(STORAGE_KEYS.userProfile) || "default").trim() || "default";
+      return currentUser || localStorage.getItem(STORAGE_KEYS.authUser) || "";
     }
 
     function userKey(key) {
-      if (key === STORAGE_KEYS.userProfile) return key;
+      if (key === STORAGE_KEYS.authToken || key === STORAGE_KEYS.authUser) return key;
       return `${getCurrentUser()}::${key}`;
     }
 
@@ -3609,20 +3892,6 @@
 
     function removeStorage(key) {
       localStorage.removeItem(userKey(key));
-    }
-
-    function switchUserProfile() {
-      const user = (userProfileInput.value || "default").trim() || "default";
-      localStorage.setItem(STORAGE_KEYS.userProfile, user);
-      referenceImages = [];
-      queue = [];
-      history = [];
-      savedPrompts = [];
-      imageLibrary = [];
-      usageStats = {};
-      loadLocalState();
-      renderAll();
-      setMessage(`已切换到用户：${user}`, "success");
     }
 
     function clampNumber(value, min, max, fallback) {

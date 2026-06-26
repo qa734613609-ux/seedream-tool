@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
@@ -21,6 +22,7 @@ const VERSION_ID =
 const UPLOAD_DIR = path.join(__dirname, "uploads");
 const DATA_DIR = path.join(__dirname, "data");
 const DB_PATH = path.join(DATA_DIR, "xiaolin-wuyou.sqlite");
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 const db = initDatabase();
 
@@ -55,9 +57,65 @@ app.get("/api/config", (req, res) => {
     canUseLocalUploadForVmodel: isPublicHttpUrl(requestBaseUrl),
     acceptsDataUrlImageInput: false,
     hasTemporaryPublicUpload: true,
+    hasAccounts: Boolean(db),
     hasDatabase: Boolean(db),
     version: VERSION_ID,
   });
+});
+
+app.get("/api/auth/me", (req, res) => {
+  const session = readSession(req);
+  if (!session) {
+    return res.json({ ok: true, authenticated: false, user: null });
+  }
+  res.json({ ok: true, authenticated: true, user: session.username });
+});
+
+app.post("/api/auth/register", (req, res) => {
+  if (!db) return res.status(503).json({ error: "数据库不可用，无法注册账号。" });
+
+  const username = normalizeUsername(req.body?.username);
+  const password = String(req.body?.password || "");
+  const validationError = validateCredentials(username, password);
+  if (validationError) return res.status(400).json({ error: validationError });
+
+  const existing = db.prepare("SELECT username FROM app_users WHERE username = ?").get(username);
+  if (existing) return res.status(409).json({ error: "账号已存在，请直接登录。" });
+
+  const salt = crypto.randomBytes(16).toString("hex");
+  const passwordHash = hashPassword(password, salt);
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO app_users (username, password_hash, password_salt, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(username, passwordHash, salt, now, now);
+
+  const token = createSession(username);
+  res.json({ ok: true, user: username, token });
+});
+
+app.post("/api/auth/login", (req, res) => {
+  if (!db) return res.status(503).json({ error: "数据库不可用，无法登录。" });
+
+  const username = normalizeUsername(req.body?.username);
+  const password = String(req.body?.password || "");
+  if (!username || !password) return res.status(400).json({ error: "请填写账号和密码。" });
+
+  const user = db.prepare("SELECT username, password_hash, password_salt FROM app_users WHERE username = ?").get(username);
+  if (!user || hashPassword(password, user.password_salt) !== user.password_hash) {
+    return res.status(401).json({ error: "账号或密码错误。" });
+  }
+
+  const token = createSession(user.username);
+  res.json({ ok: true, user: user.username, token });
+});
+
+app.post("/api/auth/logout", requireAccount, (req, res) => {
+  const tokenHash = readSessionTokenHash(req);
+  if (db && tokenHash) {
+    db.prepare("DELETE FROM app_sessions WHERE token_hash = ?").run(tokenHash);
+  }
+  res.json({ ok: true });
 });
 
 app.post("/api/upload-local", requireAuth, (req, res) => {
@@ -238,7 +296,7 @@ app.get("/api/admin/status", requireAuth, (_req, res) => {
     taskGetUrl: TASK_GET_URL,
     uploadDir: UPLOAD_DIR,
     uploads: uploadStats,
-    database: db ? { enabled: true, path: DB_PATH, states: getStateCount() } : { enabled: false },
+    database: db ? { enabled: true, path: DB_PATH, states: getStateCount(), users: getUserCount() } : { enabled: false },
     uptimeSeconds: Math.round(process.uptime()),
     memory: process.memoryUsage(),
   });
@@ -251,12 +309,12 @@ app.post("/api/admin/cleanup-uploads", requireAuth, (req, res) => {
 });
 
 app.get("/api/state", requireAuth, (req, res) => {
-  const user = sanitizeStateUser(req.query.user);
+  const user = req.account.username;
   res.json({ ok: true, user, data: readState(user) });
 });
 
 app.post("/api/state", requireAuth, (req, res) => {
-  const user = sanitizeStateUser(req.body?.user);
+  const user = req.account.username;
   const data = req.body?.data && typeof req.body.data === "object" ? req.body.data : {};
   saveState(user, data);
   res.json({ ok: true, user, savedAt: new Date().toISOString() });
@@ -411,8 +469,17 @@ function clampNumber(value, min, max, fallback) {
   return Math.max(min, Math.min(max, Math.round(number)));
 }
 
-function requireAuth(_req, _res, next) {
-  return next();
+function requireAuth(req, res, next) {
+  return requireAccount(req, res, next);
+}
+
+function requireAccount(req, res, next) {
+  const session = readSession(req);
+  if (!session) {
+    return res.status(401).json({ error: "请先登录账号。" });
+  }
+  req.account = { username: session.username };
+  next();
 }
 
 function initDatabase() {
@@ -420,6 +487,22 @@ function initDatabase() {
     fs.mkdirSync(DATA_DIR, { recursive: true });
     const database = new DatabaseSync(DB_PATH);
     database.exec(`
+      CREATE TABLE IF NOT EXISTS app_users (
+        username TEXT PRIMARY KEY,
+        password_hash TEXT NOT NULL,
+        password_salt TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS app_sessions (
+        token_hash TEXT PRIMARY KEY,
+        username TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        expires_at TEXT NOT NULL,
+        FOREIGN KEY(username) REFERENCES app_users(username) ON DELETE CASCADE
+      );
+
       CREATE TABLE IF NOT EXISTS app_state (
         user TEXT PRIMARY KEY,
         data TEXT NOT NULL,
@@ -433,8 +516,64 @@ function initDatabase() {
   }
 }
 
-function sanitizeStateUser(value) {
-  return String(value || "default").trim().replace(/[^\w.-]+/g, "-").slice(0, 80) || "default";
+function normalizeUsername(value) {
+  return String(value || "").trim().toLowerCase().replace(/[^\w.-]+/g, "-").slice(0, 40);
+}
+
+function validateCredentials(username, password) {
+  if (!username || username.length < 3) return "账号至少 3 个字符。";
+  if (!/^[a-z0-9._-]+$/.test(username)) return "账号只能包含字母、数字、点、下划线和短横线。";
+  if (password.length < 6) return "密码至少 6 位。";
+  if (password.length > 128) return "密码过长。";
+  return "";
+}
+
+function hashPassword(password, salt) {
+  return crypto.scryptSync(String(password), String(salt), 64).toString("hex");
+}
+
+function createSession(username) {
+  const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = hashSessionToken(token);
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + SESSION_TTL_MS);
+  db.prepare(`
+    INSERT INTO app_sessions (token_hash, username, created_at, expires_at)
+    VALUES (?, ?, ?, ?)
+  `).run(tokenHash, username, now.toISOString(), expiresAt.toISOString());
+  cleanupExpiredSessions();
+  return token;
+}
+
+function readSession(req) {
+  if (!db) return null;
+  const tokenHash = readSessionTokenHash(req);
+  if (!tokenHash) return null;
+  const row = db.prepare(`
+    SELECT username, expires_at
+    FROM app_sessions
+    WHERE token_hash = ?
+  `).get(tokenHash);
+  if (!row) return null;
+  if (Date.parse(row.expires_at) <= Date.now()) {
+    db.prepare("DELETE FROM app_sessions WHERE token_hash = ?").run(tokenHash);
+    return null;
+  }
+  return row;
+}
+
+function readSessionTokenHash(req) {
+  const token = String(req.headers["x-session-token"] || "").trim();
+  return token ? hashSessionToken(token) : "";
+}
+
+function hashSessionToken(token) {
+  return crypto.createHash("sha256").update(String(token)).digest("hex");
+}
+
+function cleanupExpiredSessions() {
+  if (!db) return;
+  db.prepare("DELETE FROM app_sessions WHERE expires_at <= ?").run(new Date().toISOString());
 }
 
 function readState(user) {
@@ -462,6 +601,11 @@ function saveState(user, data) {
 function getStateCount() {
   if (!db) return 0;
   return db.prepare("SELECT COUNT(*) AS count FROM app_state").get()?.count || 0;
+}
+
+function getUserCount() {
+  if (!db) return 0;
+  return db.prepare("SELECT COUNT(*) AS count FROM app_users").get()?.count || 0;
 }
 
 function inferExt(contentType, url) {
